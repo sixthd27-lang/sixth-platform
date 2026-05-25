@@ -211,6 +211,42 @@ async def tg_login(body: TgLogin):
     token = make_token(uid, user["role"])
     return {"token":token,"user_id":uid,"role":user["role"],"full_name":user["full_name"]}
 
+
+class BotTokenReq(BaseModel):
+    token: str
+
+@app.post("/auth/bot-login")
+async def bot_login(body: BotTokenReq):
+    """
+    يقبل التوكن المُنشأ من البوت ويُرجع JWT للموقع.
+    يُستدعى من الموقع عند الدخول عبر رابط البوت.
+    """
+    try:
+        payload = jwt.decode(body.token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("type") != "bot_login":
+            raise HTTPException(401, "نوع التوكن غير صحيح")
+        tg_id = int(payload["sub"])
+        name  = payload.get("name", "طالب")
+    except Exception:
+        raise HTTPException(401, "التوكن غير صالح أو منتهي الصلاحية")
+
+    # جلب أو إنشاء المستخدم
+    user = await q("SELECT * FROM users WHERE telegram_id=%s",(tg_id,),"one")
+    if not user:
+        user = await q("""
+            INSERT INTO users(telegram_id,full_name,role)
+            VALUES(%s,%s,'student') RETURNING *
+        """, (tg_id, name or "طالب"), "one")
+        uid = user["id"]
+        await q("INSERT INTO student_levels(user_id) VALUES(%s) ON CONFLICT DO NOTHING",(uid,),"none")
+        await q("INSERT INTO student_profiles(user_id) VALUES(%s) ON CONFLICT DO NOTHING",(uid,),"none")
+    else:
+        uid = user["id"]
+        await q("UPDATE users SET last_login=NOW() WHERE id=%s",(uid,),"none")
+
+    token = make_token(uid, user["role"])
+    return {"token":token,"user_id":uid,"role":user["role"],"full_name":user["full_name"]}
+
 @app.get("/auth/me")
 async def me(u=Depends(current_user)):
     lvl = await q("SELECT * FROM student_levels WHERE user_id=%s",(u["id"],),"one")

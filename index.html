@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#0a0d1a"/>
+<meta name="description" content="منصة السادس التعليمية"/>
+<title>منصة السادس التعليمية</title>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
+<style>
+/* ══════════ CSS Variables ══════════ */
+:root{
+  --bg:#0a0d1a;--surface:#0f1629;--card:#141b2d;--card2:#1a2240;
+  --border:#1e2d4a;--border2:#263454;
+  --purple:#7c3aed;--purple2:#9b59ff;--blue:#2563eb;--blue2:#4f7cff;
+  --gold:#ffd700;--green:#10b981;--orange:#f59e0b;--red:#ef4444;
+  --text:#e8f4ff;--text2:#7a9cc0;--text3:#4a6680;
+  --glass:rgba(20,27,45,0.8);
+  --glow-purple:0 0 20px rgba(124,58,237,0.4);
+  --glow-blue:0 0 20px rgba(37,99,235,0.4);
+  --glow-gold:0 0 20px rgba(255,215,0,0.3);
+  --r:16px;--r2:12px;--r3:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+  font-family:'Cairo',sans-serif;font-size:14px}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ══════════ App Shell ══════════ */
+#root{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* ══════════ Animations ══════════ */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes glow{0%,100%{box-shadow:var(--glow-purple)}50%{box-shadow:0 0 35px rgba(124,58,237,0.7)}}
+@keyframes floatUp{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes rankBounce{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+.anim-fade{animation:fadeIn .3s ease forwards}
+.anim-slide{animation:slideIn .25s ease forwards}
+
+/* ══════════ Glassmorphism Card ══════════ */
+.glass{
+  background:var(--glass);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+}
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;margin-bottom:10px;
+}
+.card:active{transform:scale(.98);transition:transform .1s}
+.card-glow{box-shadow:0 0 0 1px rgba(124,58,237,.3),0 4px 24px rgba(0,0,0,.4)}
+
+/* ══════════ Skeleton ══════════ */
+.sk{
+  background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);
+  background-size:200%;animation:shimmer 1.5s infinite;border-radius:var(--r3)
+}
+.sk-line{height:14px;margin-bottom:8px}
+.sk-lg{height:22px}.sk-sm{width:55%;height:10px}
+
+/* ══════════ Progress Bar ══════════ */
+.prog-wrap{background:rgba(255,255,255,.06);border-radius:20px;overflow:hidden}
+.prog-fill{
+  height:100%;border-radius:20px;
+  background:linear-gradient(90deg,var(--purple),var(--blue2));
+  transition:width .9s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 10px rgba(124,58,237,.4);
+}
+
+/* ══════════ Badge Pill ══════════ */
+.badge-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;border-radius:20px;padding:3px 9px;
+  border:1px solid transparent;
+}
+.badge-active{background:rgba(16,185,129,.12);color:var(--green);border-color:rgba(16,185,129,.25)}
+.badge-expired{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.2)}
+.badge-soon{background:rgba(245,158,11,.1);color:var(--orange);border-color:rgba(245,158,11,.2)}
+
+/* ══════════ Stat Chip ══════════ */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}
+.stat-chip{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r2);padding:10px 6px;text-align:center
+}
+.stat-val{
+  font-size:17px;font-weight:900;
+  background:linear-gradient(135deg,var(--purple2),var(--blue2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-key{font-size:9px;color:var(--text2);margin-top:2px}
+
+/* ══════════ Neon Button ══════════ */
+.btn{
+  width:100%;padding:12px;border:none;border-radius:var(--r2);
+  font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;
+  justify-content:center;gap:7px;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  color:#fff;box-shadow:0 4px 20px rgba(124,58,237,.35);
+}
+.btn-primary:active{transform:scale(.97);box-shadow:none}
+.btn-ghost{background:rgba(124,58,237,.1);color:var(--purple2);border:1px solid rgba(124,58,237,.2)}
+
+/* ══════════ Hero Banner ══════════ */
+.hero{
+  background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(37,99,235,.12));
+  border:1px solid rgba(124,58,237,.25);border-radius:var(--r);
+  padding:18px;margin-bottom:12px;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-30px;right:-20px;
+  width:100px;height:100px;
+  background:radial-gradient(circle,rgba(124,58,237,.25),transparent);
+  border-radius:50%;
+}
+.hero::after{
+  content:'';position:absolute;bottom:-20px;left:-20px;
+  width:70px;height:70px;
+  background:radial-gradient(circle,rgba(37,99,235,.2),transparent);
+  border-radius:50%;
+}
+
+/* ══════════ Leaderboard ══════════ */
+.lb-item{
+  display:flex;align-items:center;gap:10px;padding:12px;
+  border-radius:var(--r2);margin-bottom:8px;
+  background:var(--card);border:1px solid var(--border);
+  transition:transform .2s;
+}
+.lb-item:active{transform:scale(.98)}
+.lb-1{background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,140,0,.04));
+      border-color:rgba(255,215,0,.2);animation:glow 3s infinite}
+.lb-2{border-color:rgba(192,192,192,.15)}
+.lb-3{border-color:rgba(205,127,50,.15)}
+.lb-rank{width:28px;text-align:center;font-size:16px;font-weight:900;flex-shrink:0}
+.lb-av{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;
+       justify-content:center;font-size:22px;flex-shrink:0}
+.lb-name{font-size:13px;font-weight:700}
+.lb-meta{font-size:10px;color:var(--text2);margin-top:1px}
+.lb-xp{font-size:13px;font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* ══════════ Subject Cards ══════════ */
+.subj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:12px}
+.subj-card{
+  border-radius:var(--r);padding:16px;text-align:center;
+  cursor:pointer;border:1px solid var(--border);
+  transition:transform .18s,box-shadow .18s;
+  background:var(--card);
+}
+.subj-card:active{transform:scale(.95)}
+.subj-card:hover{box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.subj-icon{font-size:28px;margin-bottom:8px}
+.subj-name{font-size:12px;font-weight:700}
+.subj-count{font-size:10px;color:var(--text2);margin-top:3px}
+
+/* ══════════ Content Items ══════════ */
+.c-item{
+  display:flex;align-items:center;gap:10px;padding:13px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r2);margin-bottom:8px;cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.c-item:active{background:var(--card2)}
+.c-item:hover{border-color:var(--border2)}
+.c-ico{width:38px;height:38px;border-radius:10px;display:flex;
+       align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.c-body{flex:1;min-width:0}
+.c-title{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-sub{font-size:10px;color:var(--text2);margin-top:2px}
+.c-type{font-size:9px;font-weight:700;border-radius:6px;padding:2px 8px;
+        background:rgba(124,58,237,.12);color:var(--purple2);border:1px solid rgba(124,58,237,.18)}
+
+/* ══════════ Exam Cards ══════════ */
+.exam-card{
+  background:linear-gradient(135deg,var(--card),rgba(37,99,235,.06));
+  border:1px solid rgba(37,99,235,.2);border-radius:var(--r);
+  padding:15px;margin-bottom:10px;
+}
+.timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.timer-txt{
+  font-size:22px;font-weight:900;font-variant-numeric:tabular-nums;
+  min-width:68px;color:var(--text);
+}
+.timer-txt.warn{color:var(--orange)}
+.timer-txt.crit{color:var(--red);animation:pulse 1s infinite}
+
+/* ══════════ Profile Hero ══════════ */
+.prof-hero{
+  background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(37,99,235,.1));
+  border:1px solid rgba(124,58,237,.2);border-radius:var(--r);
+  padding:20px;margin-bottom:12px;text-align:center;
+}
+.prof-av{
+  width:72px;height:72px;border-radius:20px;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  display:flex;align-items:center;justify-content:center;font-size:34px;
+  margin:0 auto 12px;box-shadow:var(--glow-purple);
+  animation:floatUp 3s ease-in-out infinite;
+}
+.prof-name{font-size:18px;font-weight:900}
+.prof-badge{font-size:12px;color:var(--text2);margin-top:4px}
+
+/* ══════════ Achievement Badge ══════════ */
+.ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ach-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r2);padding:10px;text-align:center;
+}
+.ach-icon{font-size:22px;margin-bottom:4px}
+.ach-name{font-size:9px;color:var(--text2);font-weight:600}
+
+/* ══════════ Toast ══════════ */
+.toast-wrap{
+  position:fixed;top:16px;left:50%;
+  transform:translateX(-50%) translateY(-80px);
+  z-index:9999;transition:transform .25s;pointer-events:none;
+  max-width:86vw;
+}
+.toast-wrap.show{transform:translateX(-50%) translateY(0)}
+.toast-inner{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:9px 16px;font-size:12px;
+  font-weight:700;box-shadow:0 6px 24px rgba(0,0,0,.5);
+  text-align:center;
+}
+.toast-s{border-color:var(--green);color:var(--green)}
+.toast-e{border-color:var(--red);color:var(--red)}
+.toast-i{border-color:var(--blue2);color:var(--blue2)}
+
+/* ══════════ Bottom Nav ══════════ */
+.nav{
+  height:62px;background:var(--surface);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;padding:0 4px;
+  position:relative;z-index:10;
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;padding:8px 4px;border-radius:10px;transition:background .15s;
+}
+.nav-item:active{background:rgba(124,58,237,.1)}
+.nav-icon{font-size:20px;transition:transform .2s}
+.nav-label{font-size:9px;color:var(--text2);font-weight:700;transition:color .2s}
+.nav-item.active .nav-icon{transform:scale(1.2)}
+.nav-item.active .nav-label{color:var(--purple2)}
+
+/* ══════════ Sections ══════════ */
+.sec-title{
+  font-size:11px;font-weight:700;color:var(--text2);
+  text-transform:uppercase;letter-spacing:.5px;
+  margin-bottom:8px;margin-top:4px;
+}
+
+/* ══════════ Back Bar ══════════ */
+.back-bar{
+  display:flex;align-items:center;gap:8px;padding:10px 0 14px;
+  cursor:pointer;transition:opacity .15s;
+}
+.back-bar:active{opacity:.7}
+
+/* ══════════ Spinner ══════════ */
+.spinner{
+  width:32px;height:32px;border:3px solid var(--border);
+  border-top-color:var(--purple);border-radius:50%;
+  animation:spin .8s linear infinite;margin:30px auto;
+}
+
+/* ══════════ Empty State ══════════ */
+.empty{text-align:center;padding:36px 16px;color:var(--text2)}
+.empty-icon{font-size:36px;margin-bottom:10px}
+
+/* ══════════ Admin Panel ══════════ */
+.admin-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.admin-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;text-align:center;cursor:pointer;
+  transition:all .2s;
+}
+.admin-card:active{transform:scale(.95);background:var(--card2)}
+.admin-card-icon{font-size:26px;margin-bottom:8px}
+.admin-card-label{font-size:12px;font-weight:700}
+
+/* ══════════ Notification Dot ══════════ */
+.notif-dot{
+  position:absolute;top:4px;right:4px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--red);animation:pulse 2s infinite;
+}
+
+/* ══════════ Neon Line ══════════ */
+.neon-line{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--purple),transparent);
+  margin:12px 0;
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const {useState, useEffect, useRef, useCallback} = React;
+
+// ══════════════════════════════════════════════════════════════
+//  Config
+// ══════════════════════════════════════════════════════════════
+const API = window.location.hostname === "localhost"
+  ? "http://localhost:8000"
+  : "https://YOUR-RENDER-APP.onrender.com"; // ← غيّر هذا برابط Render
+
+const SUBJECTS = {
+  arabic:   {name:"اللغة العربية",    icon:"📖", color:"rgba(52,152,219,.18)"},
+  islamic:  {name:"التربية الإسلامية",icon:"🕌", color:"rgba(46,204,113,.15)"},
+  english:  {name:"اللغة الإنكليزية",icon:"🌍", color:"rgba(149,165,166,.15)"},
+  math:     {name:"الرياضيات",        icon:"📐", color:"rgba(124,58,237,.18)"},
+  biology:  {name:"الأحياء",          icon:"🧬", color:"rgba(26,188,156,.15)"},
+  chemistry:{name:"الكيمياء",         icon:"⚗️", color:"rgba(245,158,11,.12)"},
+  physics:  {name:"الفيزياء",         icon:"⚡", color:"rgba(239,68,68,.12)"},
+};
+const THRESHOLDS = [0,100,300,700,1500,3000,5000,8000,12000,18000,25000];
+
+// ══════════════════════════════════════════════════════════════
+//  Telegram WebApp (اختياري — يعمل داخل Telegram وخارجه)
+// ══════════════════════════════════════════════════════════════
+const tg = window.Telegram?.WebApp;
+if(tg){ tg.ready(); tg.expand(); tg.setHeaderColor?.('#0a0d1a'); tg.setBackgroundColor?.('#0a0d1a'); }
+const INIT_DATA = tg?.initData || "";
+const TG_USER   = tg?.initDataUnsafe?.user || {};
+
+// ══════════════════════════════════════════════════════════════
+//  قراءة توكن البوت من الرابط (تسجيل دخول تلقائي)
+// ══════════════════════════════════════════════════════════════
+(async function checkBotToken(){
+  const params = new URLSearchParams(window.location.search);
+  const botToken = params.get("token");
+  if(botToken){
+    try{
+      const res = await fetch(API + "/auth/bot-login", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({token: botToken}),
+      });
+      if(res.ok){
+        const data = await res.json();
+        localStorage.setItem("__token", data.token);
+        localStorage.setItem("__user",  JSON.stringify({user_id:data.user_id, role:data.role, full_name:data.full_name}));
+      }
+    }catch(e){ console.log("Bot token exchange failed:", e); }
+    // إزالة التوكن من الرابط بعد الاستخدام
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+})();
+
+// ══════════════════════════════════════════════════════════════
+//  API Client
+// ══════════════════════════════════════════════════════════════
+let _token = localStorage.getItem("__token") || "";
+
+async function api(path, opts={}) {
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: {
+      "Content-Type":"application/json",
+      "Authorization": _token ? `Bearer ${_token}` : "",
+      ...opts.headers,
+    },
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  if(!res.ok) {
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err.detail || `Error ${res.status}`);
+  }
+  return res.json();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  XP Utils
+// ══════════════════════════════════════════════════════════════
+function calcXP(xp) {
+  const t = THRESHOLDS;
+  let lvl=1;
+  for(let i=t.length-1;i>=0;i--){ if(xp>=t[i]){lvl=i+1;break;} }
+  if(lvl>=t.length) return {lvl,pct:100,needed:0,nextXp:t[t.length-1]};
+  const cur=t[lvl-1],nxt=t[lvl]||t[t.length-1];
+  return {lvl,pct:Math.min(100,Math.round((xp-cur)/(nxt-cur)*100)),needed:nxt-xp,nextXp:nxt};
+}
+const fmtNum = n => n>=1000?(n/1000).toFixed(1)+'K':String(n);
+
+// ══════════════════════════════════════════════════════════════
+//  Toast
+// ══════════════════════════════════════════════════════════════
+function Toast({msg,type,show}) {
+  return (
+    <div className={`toast-wrap ${show?'show':''}`}>
+      <div className={`toast-inner toast-${type}`}>{msg}</div>
+    </div>
+  );
+}
+
+function useToast() {
+  const [toast,setToast] = useState({msg:'',type:'i',show:false});
+  const t = useRef();
+  const show = (msg,type='i') => {
+    setToast({msg,type,show:true});
+    clearTimeout(t.current);
+    t.current = setTimeout(()=>setToast(p=>({...p,show:false})),2800);
+  };
+  return [toast,show];
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Timer Hook
+// ══════════════════════════════════════════════════════════════
+function fmtTime(sec) {
+  if(sec<=0) return '00:00';
+  const m=Math.floor(sec/60),s=sec%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function useCountdown(initialSec, onExpire) {
+  const [rem,setRem] = useState(Math.max(0,initialSec));
+  const ref = useRef();
+  useEffect(()=>{
+    if(initialSec<=0) return;
+    setRem(initialSec);
+    ref.current = setInterval(()=>{
+      setRem(p=>{
+        if(p<=1){ clearInterval(ref.current); onExpire?.(); return 0; }
+        return p-1;
+      });
+    },1000);
+    return ()=>clearInterval(ref.current);
+  },[initialSec]);
+  return rem;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Spinner
+// ══════════════════════════════════════════════════════════════
+const Spinner = ()=><div className="spinner"/>;
+
+// ══════════════════════════════════════════════════════════════
+//  Auth Screen
+// ══════════════════════════════════════════════════════════════
+function AuthScreen({onLogin}) {
+  const [loading,setLoading] = useState(false);
+  const [err,setErr] = useState('');
+
+  const loginTelegram = async()=>{
+    setLoading(true); setErr('');
+    try {
+      const data = await api('/auth/telegram',{
+        method:'POST',
+        body:{init_data: INIT_DATA || JSON.stringify({user:TG_USER})}
+      });
+      _token = data.token;
+      localStorage.setItem("__token",_token);
+      onLogin(data);
+    } catch(e){ setErr(e.message); }
+    setLoading(false);
+  };
+
+  useEffect(()=>{
+    // 1) إذا عنده توكن محفوظ — ادخل مباشرة
+    const savedToken = localStorage.getItem("__token");
+    if(savedToken){
+      _token = savedToken;
+      const savedUser = localStorage.getItem("__user");
+      if(savedUser){
+        try{ onLogin(JSON.parse(savedUser)); return; }catch(e){}
+      }
+      // تحقق من التوكن
+      api('/auth/me').then(data=>onLogin({
+        token:savedToken,
+        user_id:data.id,
+        role:data.role,
+        full_name:data.full_name,
+      })).catch(()=>{
+        localStorage.removeItem("__token");
+        localStorage.removeItem("__user");
+        // إذا داخل Telegram — سجّل تلقائياً
+        if(INIT_DATA || TG_USER.id) loginTelegram();
+      });
+      return;
+    }
+    // 2) إذا داخل Telegram WebApp — سجّل تلقائياً
+    if(INIT_DATA || TG_USER.id) loginTelegram();
+  },[]);
+
+  return (
+    <div style={{height:'100vh',display:'flex',flexDirection:'column',
+                 alignItems:'center',justifyContent:'center',padding:'24px'}}>
+      <div style={{textAlign:'center',marginBottom:'32px'}}>
+        <div style={{fontSize:'56px',marginBottom:'16px',animation:'floatUp 3s ease-in-out infinite'}}>🎓</div>
+        <div style={{fontSize:'22px',fontWeight:900,
+                     background:'linear-gradient(135deg,#7c3aed,#2563eb)',
+                     WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>
+          منصة السادس التعليمية
+        </div>
+        <div style={{fontSize:'13px',color:'var(--text2)',marginTop:'8px'}}>
+          المنصة الأولى للطلاب في العراق
+        </div>
+      </div>
+      {loading && <Spinner/>}
+      {err && <div style={{color:'var(--red)',fontSize:'12px',marginBottom:'12px',textAlign:'center'}}>{err}</div>}
+      {!loading && (
+        <button className="btn btn-primary" onClick={loginTelegram}
+                style={{maxWidth:'280px'}}>
+          🚀 الدخول عبر Telegram
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Home Page
+// ══════════════════════════════════════════════════════════════
+function HomePage({profile,goPage,toast}) {
+  if(!profile) return <Spinner/>;
+  const {xp=0,level=1,badge='🥉',full_name,completed_lec=0,total_exams=0,rank_pos} = profile;
+  const pr = calcXP(xp);
+  return (
+    <div className="anim-fade">
+      {/* Hero */}
+      <div className="hero">
+        <div style={{position:'relative',zIndex:1}}>
+          <div style={{fontSize:'12px',color:'var(--text2)'}}>مرحباً بك 👋</div>
+          <div style={{fontSize:'20px',fontWeight:900,
+                       background:'linear-gradient(135deg,var(--purple2),var(--blue2))',
+                       WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',
+                       marginTop:'4px'}}>
+            {full_name || TG_USER.first_name || '—'}
+          </div>
+          <div style={{fontSize:'11px',color:'var(--text2)',marginTop:'3px'}}>
+            {badge} المستوى {level} • {xp.toLocaleString('ar')} XP
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="stat-grid">
+        <div className="stat-chip"><div className="stat-val">{fmtNum(xp)}</div><div className="stat-key">⭐ XP</div></div>
+        <div className="stat-chip"><div className="stat-val">{level}</div><div className="stat-key">🏅 المستوى</div></div>
+        <div className="stat-chip"><div className="stat-val">{rank_pos?`#${rank_pos}`:'—'}</div><div className="stat-key">🏆 الترتيب</div></div>
+      </div>
+
+      {/* Progress */}
+      <div className="card" style={{marginBottom:'14px'}}>
+        <div style={{display:'flex',justifyContent:'space-between',marginBottom:'7px'}}>
+          <span style={{fontSize:'12px',fontWeight:700}}>التقدم للمستوى التالي</span>
+          <span style={{fontSize:'11px',color:'var(--text2)'}}>{pr.pct}%</span>
+        </div>
+        <div className="prog-wrap" style={{height:'8px'}}>
+          <div className="prog-fill" style={{width:`${pr.pct}%`}}/>
+        </div>
+        <div style={{fontSize:'10px',color:'var(--text2)',marginTop:'5px'}}>
+          {pr.needed>0 ? `يلزمك ${pr.needed.toLocaleString('ar')} XP للمستوى ${level+1}` : '🎉 وصلت أعلى مستوى!'}
+        </div>
+      </div>
+
+      {/* Quick Access */}
+      <div className="sec-title">الأقسام</div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'8px',marginBottom:'14px'}}>
+        {[
+          {icon:'📚',label:'المحاضرات',page:'lectures',color:'rgba(124,58,237,.12)'},
+          {icon:'📝',label:'الامتحانات',page:'exams',color:'rgba(37,99,235,.12)'},
+          {icon:'🏆',label:'الأوائل',page:'leaderboard',color:'rgba(255,215,0,.08)'},
+          {icon:'👤',label:'ملفي',page:'profile',color:'rgba(16,185,129,.1)'},
+        ].map(({icon,label,page,color})=>(
+          <div key={page} onClick={()=>goPage(page)}
+               style={{background:color,border:'1px solid var(--border)',borderRadius:'var(--r)',
+                       padding:'16px',textAlign:'center',cursor:'pointer'}}>
+            <div style={{fontSize:'26px',marginBottom:'6px'}}>{icon}</div>
+            <div style={{fontSize:'12px',fontWeight:700}}>{label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Student Stats */}
+      <div className="card">
+        <div className="sec-title" style={{marginTop:0}}>إحصائياتك</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
+          <div style={{textAlign:'center',padding:'8px'}}>
+            <div style={{fontSize:'20px',fontWeight:900,color:'var(--blue2)'}}>{completed_lec}</div>
+            <div style={{fontSize:'10px',color:'var(--text2)'}}>📚 محاضرة مكتملة</div>
+          </div>
+          <div style={{textAlign:'center',padding:'8px'}}>
+            <div style={{fontSize:'20px',fontWeight:900,color:'var(--green)'}}>{total_exams}</div>
+            <div style={{fontSize:'10px',color:'var(--text2)'}}>📝 امتحان مقدَّم</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Lectures Page
+// ══════════════════════════════════════════════════════════════
+function LecturesPage({toast}) {
+  const [lectures,setLectures] = useState(null);
+  const [selSubj,setSelSubj]   = useState(null);
+  const [loading,setLoading]   = useState(true);
+
+  const load = async()=>{
+    setLoading(true);
+    try {
+      const d = await api('/api/lectures?course_type=15/5');
+      setLectures(d.lectures||{});
+    } catch(e){ toast(e.message,'e'); }
+    setLoading(false);
+  };
+  useEffect(()=>{ load(); },[]);
+
+  const openFile = async(lec)=>{
+    tg?.HapticFeedback?.impactOccurred('light');
+    // Mark complete
+    api(`/api/lectures/${lec.id}/complete`,{method:'POST'}).catch(()=>{});
+    const url = API+'/api/file/'+lec.file_id;
+    tg?.openLink?.(url);
+  };
+
+  if(loading) return <Spinner/>;
+
+  if(selSubj) {
+    const items = lectures[selSubj] || [];
+    const info  = SUBJECTS[selSubj] || {};
+    const chapters = [...new Set(items.map(i=>i.chapter||'عام'))];
+    return (
+      <div className="anim-slide">
+        <div className="back-bar" onClick={()=>setSelSubj(null)}>
+          <span style={{fontSize:'18px'}}>◀️</span>
+          <span style={{fontSize:'13px',color:'var(--text2)',fontWeight:700}}>رجوع</span>
+        </div>
+        <div style={{fontSize:'17px',fontWeight:900,marginBottom:'12px'}}>
+          {info.icon} {info.name}
+        </div>
+        {!items.length ? (
+          <div className="empty"><div className="empty-icon">📭</div>لا يوجد محتوى بعد</div>
+        ) : chapters.map(ch=>(
+          <div key={ch}>
+            <div className="sec-title">{ch}</div>
+            {items.filter(i=>(i.chapter||'عام')===ch).map(item=>{
+              const typeIcon = {pdf:'📄',video:'🎬',image:'🖼️',document:'📎'}[item.file_type]||'🔗';
+              return (
+                <div key={item.id} className="c-item" onClick={()=>openFile(item)}>
+                  <div className="c-ico" style={{background:'rgba(124,58,237,.12)'}}>{typeIcon}</div>
+                  <div className="c-body">
+                    <div className="c-title">{item.is_pinned?'📌 ':''}{item.title}</div>
+                    <div className="c-sub">{item.teacher_name||''} • {item.view_count} مشاهدة</div>
+                  </div>
+                  <span className="c-type">{(item.file_type||'PDF').toUpperCase()}</span>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="anim-fade">
+      <div style={{fontSize:'18px',fontWeight:900,marginBottom:'12px'}}>📚 المحاضرات</div>
+      <div className="subj-grid">
+        {Object.entries(SUBJECTS).map(([key,info])=>{
+          const count = (lectures[key]||[]).length;
+          return (
+            <div key={key} className="subj-card"
+                 style={{background:info.color}}
+                 onClick={()=>{ tg?.HapticFeedback?.impactOccurred('light'); setSelSubj(key); }}>
+              <div className="subj-icon">{info.icon}</div>
+              <div className="subj-name">{info.name}</div>
+              <div className="subj-count">{count} عنصر</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Exam Card with Timer
+// ══════════════════════════════════════════════════════════════
+function ExamCard({exam,toast,onRefresh}) {
+  const [status,setStatus]   = useState(exam.my_status||'not_started');
+  const [remaining,setRem]   = useState(exam.remaining_seconds||0);
+  const [loading,setLoading] = useState(false);
+  const subj = SUBJECTS[exam.subject_key]||{};
+  const rem  = useCountdown(status==='started'?remaining:0, ()=>{ setStatus('expired'); });
+
+  const startExam = async()=>{
+    setLoading(true);
+    try {
+      const d = await api(`/api/exams/${exam.id}/start`,{method:'POST'});
+      setStatus(d.status);
+      if(d.remaining) setRem(d.remaining);
+      toast('✅ بدأ الامتحان! الوقت يسير…','s');
+    } catch(e){ toast(e.message,'e'); }
+    setLoading(false);
+  };
+
+  const submitExam = async()=>{
+    if(rem<=0){ toast('انتهى الوقت!','e'); return; }
+    setLoading(true);
+    try {
+      await api(`/api/exams/${exam.id}/submit`,{
+        method:'POST',body:{answer_text:'تم التسليم من التطبيق'}
+      });
+      setStatus('submitted');
+      toast('✅ تم التسليم بنجاح! +30 XP 🎉','s');
+      tg?.HapticFeedback?.notificationOccurred('success');
+    } catch(e){ toast(e.message,'e'); }
+    setLoading(false);
+  };
+
+  const pct = remaining>0?Math.round((rem/remaining)*100):0;
+  const warnClass = pct<10?'crit':pct<25?'warn':'';
+
+  return (
+    <div className="exam-card">
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'9px'}}>
+        <div style={{flex:1,marginLeft:'8px'}}>
+          <div style={{fontSize:'13px',fontWeight:700,marginBottom:'3px'}}>{exam.title}</div>
+          <div style={{fontSize:'10px',color:'var(--text2)'}}>{exam.description||''}</div>
+        </div>
+        <span className={`badge-pill ${status==='not_started'?'badge-soon':status==='started'?'badge-active':'badge-expired'}`}>
+          {status==='not_started'?'⏳ لم يبدأ':status==='started'?'🔴 جارٍ':status==='submitted'?'✅ مسلَّم':'❌ منتهي'}
+        </span>
+      </div>
+      <div style={{display:'flex',gap:'6px',flexWrap:'wrap',marginBottom:'10px'}}>
+        <span style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'6px',padding:'2px 7px',fontSize:'10px'}}>
+          ⏱️ {exam.duration_minutes} دقيقة
+        </span>
+        <span style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'6px',padding:'2px 7px',fontSize:'10px'}}>
+          {subj.icon} {subj.name||exam.subject_key}
+        </span>
+      </div>
+      {status==='started' && (
+        <div className="timer-wrap" style={{marginBottom:'10px'}}>
+          <div style={{flex:1}}>
+            <div className="prog-wrap" style={{height:'7px'}}>
+              <div className="prog-fill" style={{
+                width:`${pct}%`,
+                background:pct<10?'linear-gradient(90deg,var(--red),#c0392b)':
+                           pct<25?'linear-gradient(90deg,var(--orange),#e67e22)':
+                           'linear-gradient(90deg,var(--green),var(--blue2))'
+              }}/>
+            </div>
+          </div>
+          <div className={`timer-txt ${warnClass}`}>{fmtTime(rem)}</div>
+        </div>
+      )}
+      {status==='submitted' && exam.my_score!=null && (
+        <div style={{background:'rgba(16,185,129,.1)',border:'1px solid rgba(16,185,129,.2)',
+                     borderRadius:'8px',padding:'8px 12px',fontSize:'12px',fontWeight:700,color:'var(--green)'}}>
+          📊 درجتك: {exam.my_score?.toFixed(1)}/100
+        </div>
+      )}
+      {status==='not_started' && exam.is_active && (
+        <button className="btn btn-primary" onClick={startExam} disabled={loading}>
+          {loading?<Spinner/>:'📝 بدء الامتحان'}
+        </button>
+      )}
+      {status==='started' && rem>0 && (
+        <button className="btn btn-primary" onClick={submitExam} disabled={loading}>
+          {loading?<Spinner/>:'📤 تسليم الإجابة'}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ExamsPage({toast}) {
+  const [exams,setExams]   = useState(null);
+  const [loading,setLoading] = useState(true);
+  const load = async()=>{
+    setLoading(true);
+    try { const d=await api('/api/exams'); setExams(d.exams||[]); }
+    catch(e){ toast(e.message,'e'); }
+    setLoading(false);
+  };
+  useEffect(()=>{ load(); },[]);
+  if(loading) return <Spinner/>;
+  return (
+    <div className="anim-fade">
+      <div style={{fontSize:'18px',fontWeight:900,marginBottom:'12px'}}>📝 الامتحانات</div>
+      {!exams?.length?(
+        <div className="empty"><div className="empty-icon">📭</div>لا توجد امتحانات نشطة</div>
+      ):exams.map(e=><ExamCard key={e.id} exam={e} toast={toast} onRefresh={load}/>)}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Leaderboard Page
+// ══════════════════════════════════════════════════════════════
+function LeaderboardPage({toast}) {
+  const [rows,setRows] = useState(null);
+  useEffect(()=>{ api('/api/leaderboard?limit=20').then(d=>setRows(d.leaderboard)).catch(()=>{}); },[]);
+  if(!rows) return <Spinner/>;
+  const medals = ['🥇','🥈','🥉'];
+  return (
+    <div className="anim-fade">
+      <div style={{fontSize:'18px',fontWeight:900,marginBottom:'14px'}}>🏆 لوحة الأوائل</div>
+      {!rows.length?(
+        <div className="empty"><div className="empty-icon">📊</div>لا توجد بيانات</div>
+      ):rows.map((r,i)=>(
+        <div key={r.user_id} className={`lb-item ${i<3?`lb-${i+1}`:''}`}
+             style={{animationDelay:`${i*0.04}s`}}>
+          <div className="lb-rank">{medals[i]||`${i+1}.`}</div>
+          <div className="lb-av"
+               style={{background:i===0?'linear-gradient(135deg,#ffd700,#ff8c00)':
+                                  i===1?'linear-gradient(135deg,#c0c0c0,#808080)':
+                                  i===2?'linear-gradient(135deg,#cd7f32,#a0522d)':
+                                  'var(--card2)'}}>
+            {r.badge}
+          </div>
+          <div style={{flex:1}}>
+            <div className="lb-name">{r.full_name||'—'}</div>
+            <div className="lb-meta">LVL {r.level||1} {r.school_name?`• ${r.school_name}`:''}</div>
+          </div>
+          <div className="lb-xp">{(r.xp||0).toLocaleString('ar')}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Profile Page
+// ══════════════════════════════════════════════════════════════
+function ProfilePage({profile,toast,onRefresh}) {
+  const [subs,setSubs] = useState(null);
+  useEffect(()=>{
+    api('/api/notifications').then(d=>{}).catch(()=>{});
+  },[]);
+
+  if(!profile) return <Spinner/>;
+  const {xp=0,level=1,badge='🥉',full_name,rank_pos,school_name,course_type,
+         completed_lec=0,total_exams=0,achievements=[],progress={}} = profile;
+  const pr = progress.pct!=null?progress:calcXP(xp);
+
+  const rankColors = {
+    '🥉':'linear-gradient(135deg,#cd7f32,#a0522d)',
+    '🥈':'linear-gradient(135deg,#c0c0c0,#808080)',
+    '🥇':'linear-gradient(135deg,#ffd700,#ff8c00)',
+    '💎':'linear-gradient(135deg,#00e5ff,#0070ff)',
+    '👑':'linear-gradient(135deg,#ffd700,#ff6b6b)',
+  };
+
+  return (
+    <div className="anim-fade">
+      <div className="prof-hero">
+        <div className="prof-av" style={{background:rankColors[badge]||'linear-gradient(135deg,var(--purple),var(--blue))'}}>
+          {badge}
+        </div>
+        <div className="prof-name">{full_name||TG_USER.first_name||'—'}</div>
+        <div className="prof-badge">{rank_pos?`🏆 الترتيب: #${rank_pos}`:'المستوى '+level}</div>
+      </div>
+
+      <div className="stat-grid">
+        <div className="stat-chip"><div className="stat-val">{fmtNum(xp)}</div><div className="stat-key">⭐ XP</div></div>
+        <div className="stat-chip"><div className="stat-val">{level}</div><div className="stat-key">🏅 المستوى</div></div>
+        <div className="stat-chip"><div className="stat-val">{completed_lec}</div><div className="stat-key">📚 محاضرة</div></div>
+      </div>
+
+      <div className="card">
+        <div style={{fontSize:'12px',fontWeight:700,marginBottom:'8px'}}>📈 التقدم للمستوى التالي</div>
+        <div className="prog-wrap" style={{height:'10px'}}>
+          <div className="prog-fill" style={{width:`${pr.pct}%`}}/>
+        </div>
+        <div style={{display:'flex',justifyContent:'space-between',marginTop:'5px',fontSize:'10px',color:'var(--text2)'}}>
+          <span>{xp.toLocaleString('ar')} XP</span>
+          <span>{pr.pct}%</span>
+          <span>{pr.nextXp?.toLocaleString('ar')||'—'} XP</span>
+        </div>
+      </div>
+
+      <div className="sec-title">معلومات الطالب</div>
+      <div className="card">
+        {[['🏫','المدرسة',school_name||'—'],['📘','الدورة',course_type||'15/5'],['📝','الامتحانات',total_exams]].map(([i,k,v])=>(
+          <div key={k} style={{display:'flex',alignItems:'center',gap:'10px',padding:'8px 0',
+                               borderBottom:'1px solid var(--border)'}}>
+            <span style={{fontSize:'18px',width:'28px'}}>{i}</span>
+            <div>
+              <div style={{fontSize:'10px',color:'var(--text2)'}}>{k}</div>
+              <div style={{fontSize:'13px',fontWeight:700}}>{v}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {achievements.length>0 && (
+        <>
+          <div className="sec-title">الإنجازات</div>
+          <div className="ach-grid">
+            {achievements.map(a=>(
+              <div key={a.key} className="ach-item">
+                <div className="ach-icon">{a.icon}</div>
+                <div className="ach-name">{a.name}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Notifications Page
+// ══════════════════════════════════════════════════════════════
+function NotifPage({toast}) {
+  const [notifs,setNotifs] = useState(null);
+  useEffect(()=>{
+    api('/api/notifications').then(d=>{setNotifs(d.notifications); api('/api/notifications/read',{method:'POST'});}).catch(()=>{});
+  },[]);
+  const typeIcon = {success:'✅',warning:'⚠️',info:'ℹ️',exam:'📝',lecture:'📚'};
+  if(!notifs) return <Spinner/>;
+  return (
+    <div className="anim-fade">
+      <div style={{fontSize:'18px',fontWeight:900,marginBottom:'12px'}}>🔔 الإشعارات</div>
+      {!notifs.length?(
+        <div className="empty"><div className="empty-icon">🔕</div>لا توجد إشعارات</div>
+      ):notifs.map(n=>(
+        <div key={n.id} className="card" style={{opacity:n.is_read?.8:1}}>
+          <div style={{display:'flex',gap:'10px',alignItems:'flex-start'}}>
+            <span style={{fontSize:'20px'}}>{typeIcon[n.type]||'🔔'}</span>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,fontSize:'13px'}}>{n.title}</div>
+              <div style={{fontSize:'12px',color:'var(--text2)',marginTop:'4px'}}>{n.message}</div>
+              <div style={{fontSize:'10px',color:'var(--text3)',marginTop:'5px'}}>
+                {new Date(n.created_at).toLocaleDateString('ar-IQ')}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Admin Page
+// ══════════════════════════════════════════════════════════════
+function AdminPage({toast,profile}) {
+  const [stats,setStats] = useState(null);
+  const [view,setView]   = useState('main');
+  const [users,setUsers] = useState(null);
+
+  useEffect(()=>{
+    api('/api/admin/stats').then(setStats).catch(()=>{});
+  },[]);
+
+  const updateRanks = async()=>{
+    try { await api('/api/admin/update-ranks',{method:'POST'}); toast('✅ تم تحديث الترتيب','s'); }
+    catch(e){ toast(e.message,'e'); }
+  };
+
+  const loadUsers = async()=>{
+    try { const d=await api('/api/admin/users'); setUsers(d.users); setView('users'); }
+    catch(e){ toast(e.message,'e'); }
+  };
+
+  if(view==='users') return (
+    <div className="anim-slide">
+      <div className="back-bar" onClick={()=>setView('main')}>
+        <span style={{fontSize:'18px'}}>◀️</span>
+        <span style={{fontSize:'13px',color:'var(--text2)',fontWeight:700}}>رجوع</span>
+      </div>
+      <div style={{fontSize:'17px',fontWeight:900,marginBottom:'12px'}}>👥 قائمة الطلاب</div>
+      {(users||[]).map(u=>(
+        <div key={u.id} className="card">
+          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+            <div style={{fontSize:'22px'}}>{u.badge||'🥉'}</div>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700}}>{u.full_name}</div>
+              <div style={{fontSize:'10px',color:'var(--text2)'}}>
+                LVL {u.level||1} | {(u.xp||0).toLocaleString('ar')} XP | {u.school_name||'—'}
+              </div>
+            </div>
+            <div style={{fontSize:'10px',color:'var(--text3)'}}>{u.course_type||'15/5'}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="anim-fade">
+      <div style={{fontSize:'18px',fontWeight:900,marginBottom:'12px'}}>⚙️ لوحة الإدارة</div>
+      {stats && (
+        <div className="stat-grid" style={{marginBottom:'14px'}}>
+          <div className="stat-chip"><div className="stat-val">{stats.total_students}</div><div className="stat-key">👥 طالب</div></div>
+          <div className="stat-chip"><div className="stat-val">{stats.total_lectures}</div><div className="stat-key">📚 محاضرة</div></div>
+          <div className="stat-chip"><div className="stat-val">{stats.total_exams}</div><div className="stat-key">📝 امتحان</div></div>
+        </div>
+      )}
+      <div className="admin-grid">
+        {[
+          {icon:'👥',label:'الطلاب',act:loadUsers},
+          {icon:'🏆',label:'تحديث الترتيب',act:updateRanks},
+        ].map(({icon,label,act})=>(
+          <div key={label} className="admin-card" onClick={act}>
+            <div className="admin-card-icon">{icon}</div>
+            <div className="admin-card-label">{label}</div>
+          </div>
+        ))}
+      </div>
+      {stats?.top_students?.length>0 && (
+        <>
+          <div className="sec-title">أوائل الطلاب</div>
+          {stats.top_students.map((s,i)=>(
+            <div key={i} className="card" style={{padding:'10px 14px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                <span style={{fontSize:'20px'}}>{['🥇','🥈','🥉','4.','5.'][i]}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:700,fontSize:'13px'}}>{s.full_name}</div>
+                  <div style={{fontSize:'10px',color:'var(--text2)'}}>LVL {s.level} | {(s.xp||0).toLocaleString('ar')} XP</div>
+                </div>
+                <span style={{fontSize:'18px'}}>{s.badge}</span>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Main App
+// ══════════════════════════════════════════════════════════════
+function App() {
+  const [user,setUser]       = useState(null);
+  const [profile,setProfile] = useState(null);
+  const [page,setPage]       = useState('home');
+  const [history,setHistory] = useState([]);
+  const [notifCount,setNC]   = useState(0);
+  const [toast,showToast]    = useToast();
+
+  const login = async(data)=>{
+    setUser(data);
+    try {
+      const p = await api('/api/profile');
+      setProfile(p);
+      // Check notifs
+      api('/api/notifications').then(d=>setNC(d.unread||0)).catch(()=>{});
+    } catch(e){}
+  };
+
+  const goPage = (name,push=true)=>{
+    if(push && page!==name) setHistory(h=>[...h,page]);
+    setPage(name);
+    tg?.HapticFeedback?.selectionChanged();
+  };
+  const goBack = ()=>{
+    if(!history.length){ setPage('home'); return; }
+    const prev = history[history.length-1];
+    setHistory(h=>h.slice(0,-1));
+    setPage(prev);
+  };
+
+  const refreshProfile = async()=>{
+    try { const p=await api('/api/profile'); setProfile(p); } catch(e){}
+  };
+
+  if(!user) return <AuthScreen onLogin={login}/>;
+
+  const isAdmin = profile?.role && ['admin','owner','teacher'].includes(profile.role);
+
+  const navItems = [
+    {id:'home',icon:'🏠',label:'الرئيسية'},
+    {id:'lectures',icon:'📚',label:'المحاضرات'},
+    {id:'exams',icon:'📝',label:'الامتحانات'},
+    {id:'leaderboard',icon:'🏆',label:'الأوائل'},
+    {id:'profile',icon:'👤',label:'ملفي'},
+  ];
+
+  const pages = {
+    home:        <HomePage profile={profile} goPage={goPage} toast={showToast}/>,
+    lectures:    <LecturesPage toast={showToast}/>,
+    exams:       <ExamsPage toast={showToast}/>,
+    leaderboard: <LeaderboardPage toast={showToast}/>,
+    profile:     <ProfilePage profile={profile} toast={showToast} onRefresh={refreshProfile}/>,
+    notifs:      <NotifPage toast={showToast}/>,
+    admin:       <AdminPage toast={showToast} profile={profile}/>,
+  };
+
+  return (
+    <div id="root" style={{height:'100vh',display:'flex',flexDirection:'column'}}>
+      <Toast msg={toast.msg} type={toast.type} show={toast.show}/>
+
+      {/* Main Page Area */}
+      <div style={{flex:1,overflow:'hidden',position:'relative'}}>
+        <div style={{position:'absolute',inset:0,overflowY:'auto',padding:'14px 14px 80px'}}>
+          {pages[page] || pages.home}
+        </div>
+      </div>
+
+      {/* Bottom Nav */}
+      <nav className="nav">
+        {navItems.map(({id,icon,label})=>(
+          <div key={id} className={`nav-item ${page===id?'active':''}`}
+               onClick={()=>goPage(id,false)}>
+            <span className="nav-icon">{icon}</span>
+            <span className="nav-label">{label}</span>
+          </div>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

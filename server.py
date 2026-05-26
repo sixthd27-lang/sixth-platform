@@ -18,16 +18,16 @@ from pydantic import BaseModel
 # ══════════════════════════════════════
 #  Config
 # ══════════════════════════════════════
-DB_URL     = os.getenv("DATABASE_URL", "")
-SECRET     = os.getenv("SECRET_KEY",   "sadis-super-secret-2024")
-ORIGINS    = os.getenv("ORIGINS", "*").split(",")
-ALGO       = "HS256"
+DB_URL = os.getenv("DATABASE_URL", "")
+SECRET = os.getenv("SECRET_KEY", "sadis-super-secret-2024")
+ORIGINS = os.getenv("ORIGINS", "*").split(",")
+ALGO = "HS256"
 TOKEN_DAYS = 30
 
 THRESHOLDS = [0, 100, 300, 700, 1500, 3000, 5000, 8000, 12000, 18000, 25000]
-XP_MAP     = {"lecture": 10, "exam": 30, "exam_full": 50, "login": 5}
+XP_MAP = {"lecture": 10, "exam": 30, "exam_full": 50, "login": 5}
 
-pwd  = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
 auth = HTTPBearer(auto_error=False)
 
 # ══════════════════════════════════════
@@ -102,7 +102,7 @@ def get_badge(lvl):
     return "🥉"
 
 def xp_info(xp):
-    t   = THRESHOLDS
+    t = THRESHOLDS
     lvl = calc_level(xp)
     if lvl >= len(t): return {"level":lvl,"pct":100,"needed":0,"next":t[-1]}
     cur = t[lvl-1]; nxt = t[lvl]
@@ -114,9 +114,9 @@ async def give_xp(user_id: int, action: str) -> dict:
     if not gained: return {}
     row = await db("SELECT xp,level FROM student_data WHERE user_id=%s",(user_id,),"one")
     old_lvl = (row or {}).get("level",1)
-    new_xp  = (row or {}).get("xp",0) + gained
+    new_xp = (row or {}).get("xp",0) + gained
     new_lvl = calc_level(new_xp)
-    badge   = get_badge(new_lvl)
+    badge = get_badge(new_lvl)
     await db("""
         INSERT INTO student_data(user_id,xp,level,badge,updated_at)
         VALUES(%s,%s,%s,%s,NOW())
@@ -139,7 +139,7 @@ def make_token(uid,role):
 async def get_user(creds: HTTPAuthorizationCredentials = Depends(auth)):
     if not creds: raise HTTPException(401,"يجب تسجيل الدخول")
     try:
-        p   = jwt.decode(creds.credentials, SECRET, algorithms=[ALGO])
+        p = jwt.decode(creds.credentials, SECRET, algorithms=[ALGO])
         uid = int(p["sub"])
     except (JWTError,ValueError):
         raise HTTPException(401,"رمز غير صالح")
@@ -157,40 +157,40 @@ def require(*roles):
 #  Pydantic
 # ══════════════════════════════════════
 class RegisterReq(BaseModel):
-    full_name:   str
-    username:    str
-    password:    str
+    full_name: str
+    username: str
+    password: str
     school_name: str = ""
-    class_code:  str = ""
+    class_code: str = ""
 
 class LoginReq(BaseModel):
     username: str
     password: str
 
 class LectureReq(BaseModel):
-    title:       str
+    title: str
     subject_key: str
-    chapter:     str = ""
+    chapter: str = ""
     description: str = ""
-    url:         str = ""
-    file_type:   str = "link"
+    url: str = ""
+    file_type: str = "link"
 
 class ExamReq(BaseModel):
-    title:            str
-    subject_key:      str
+    title: str
+    subject_key: str
     duration_minutes: int = 60
-    description:      str = ""
-    url:              str = ""
+    description: str = ""
+    url: str = ""
 
 class SubmitReq(BaseModel):
-    exam_id:     int
+    exam_id: int
     answer_text: str = ""
-    answer_url:  str = ""
+    answer_url: str = ""
 
 class ScoreReq(BaseModel):
     submission_id: int
-    score:         float
-    feedback:      str = ""
+    score: float
+    feedback: str = ""
 
 # ══════════════════════════════════════
 #  Auth Routes
@@ -199,8 +199,8 @@ class ScoreReq(BaseModel):
 async def register(b: RegisterReq):
     ex = await db("SELECT id FROM users WHERE username=%s",(b.username,),"one")
     if ex: raise HTTPException(400,"اسم المستخدم موجود مسبقاً")
-    h   = pwd.hash(b.password)
-    u   = await db("""
+    h = pwd.hash(b.password)
+    u = await db("""
         INSERT INTO users(full_name,username,password_hash,school_name,class_code)
         VALUES(%s,%s,%s,%s,%s) RETURNING id,role
     """, (b.full_name,b.username,h,b.school_name,b.class_code),"one")
@@ -232,32 +232,32 @@ async def me(u=Depends(get_user)):
 @app.get("/api/profile")
 async def profile(u=Depends(get_user)):
     uid = u["id"]
-    sd  = await db("SELECT * FROM student_data WHERE user_id=%s",(uid,),"one") or {}
-    lc  = await db("SELECT COUNT(*) AS c FROM completed_lectures WHERE user_id=%s",(uid,),"one") or {}
-    sc  = await db("SELECT COUNT(*) AS c FROM exam_submissions WHERE user_id=%s AND submitted_at IS NOT NULL",(uid,),"one") or {}
-    xp  = sd.get("xp",0)
-    pr  = xp_info(xp)
+    sd = await db("SELECT * FROM student_data WHERE user_id=%s",(uid,),"one") or {}
+    lc = await db("SELECT COUNT(*) AS c FROM completed_lectures WHERE user_id=%s",(uid,),"one") or {}
+    sc = await db("SELECT COUNT(*) AS c FROM exam_submissions WHERE user_id=%s AND submitted_at IS NOT NULL",(uid,),"one") or {}
+    xp = sd.get("xp",0)
+    pr = xp_info(xp)
     return {
-        "user_id":    uid,
-        "full_name":  u["full_name"],
-        "username":   u["username"],
-        "role":       u["role"],
-        "school_name":u.get("school_name",""),
+        "user_id": uid,
+        "full_name": u["full_name"],
+        "username": u["username"],
+        "role": u["role"],
+        "school_name": u.get("school_name",""),
         "class_code": u.get("class_code",""),
-        "xp":         xp,
-        "level":      sd.get("level",1),
-        "badge":      sd.get("badge","🥉"),
-        "rank_pos":   sd.get("rank_pos"),
-        "progress":   pr,
-        "done_lec":   lc.get("c",0),
-        "done_exam":  sc.get("c",0),
+        "xp": xp,
+        "level": sd.get("level",1),
+        "badge": sd.get("badge","🥉"),
+        "rank_pos": sd.get("rank_pos"),
+        "progress": pr,
+        "done_lec": lc.get("c",0),
+        "done_exam": sc.get("c",0),
     }
 
 @app.patch("/api/profile")
 async def edit_profile(data: dict, u=Depends(get_user)):
-    uid  = u["id"]
-    ok   = {"school_name","full_name"}
-    upd  = {k:v for k,v in data.items() if k in ok}
+    uid = u["id"]
+    ok = {"school_name","full_name"}
+    upd = {k:v for k,v in data.items() if k in ok}
     if "full_name" in upd:
         await db("UPDATE users SET full_name=%s WHERE id=%s",(upd.pop("full_name"),uid),"all")
     if "school_name" in upd:
@@ -327,10 +327,10 @@ async def get_exams(u=Depends(get_user)):
         LEFT JOIN users u2 ON u2.id=e.created_by
         WHERE e.is_active=TRUE ORDER BY e.created_at DESC
     """)
-    now   = datetime.now(timezone.utc)
+    now = datetime.now(timezone.utc)
     exams = []
     for r in (rows or []):
-        e  = dict(r)
+        e = dict(r)
         e["created_at"] = str(e.get("created_at",""))
         # جلب حالة الطالب مع الامتحان
         sub = await db("SELECT * FROM exam_submissions WHERE exam_id=%s AND user_id=%s",(e["id"],u["id"]),"one")
@@ -340,17 +340,17 @@ async def get_exams(u=Depends(get_user)):
                 if end.tzinfo is None: end = end.replace(tzinfo=timezone.utc)
                 rem = int((end-now).total_seconds())
                 e["remaining"] = max(0,rem)
-                e["expired"]   = rem <= 0
+                e["expired"] = rem <= 0
             else:
                 e["remaining"] = e["duration_minutes"]*60
-                e["expired"]   = False
+                e["expired"] = False
             e["my_status"] = "submitted" if sub.get("submitted_at") else ("expired" if e["expired"] else "started")
-            e["my_score"]  = sub.get("score")
+            e["my_score"] = sub.get("score")
         else:
             e["remaining"] = e["duration_minutes"]*60
-            e["expired"]   = False
+            e["expired"] = False
             e["my_status"] = "not_started"
-            e["my_score"]  = None
+            e["my_score"] = None
         exams.append(e)
     return {"exams":exams}
 
@@ -368,7 +368,7 @@ async def add_exam(b: ExamReq, u=Depends(require("teacher","admin"))):
 
 @app.post("/api/exams/{eid}/start")
 async def start_exam(eid:int, u=Depends(get_user)):
-    uid  = u["id"]
+    uid = u["id"]
     exam = await db("SELECT * FROM exams WHERE id=%s AND is_active=TRUE",(eid,),"one")
     if not exam: raise HTTPException(404,"الامتحان غير موجود")
     sub = await db("SELECT * FROM exam_submissions WHERE exam_id=%s AND user_id=%s",(eid,uid),"one")
@@ -500,7 +500,7 @@ async def admin_users(page:int=1, u=Depends(require("admin"))):
 @app.post("/api/admin/broadcast")
 async def broadcast(data:dict, u=Depends(require("admin"))):
     title = data.get("title","إشعار")
-    msg   = data.get("message","")
+    msg = data.get("message","")
     if not msg: raise HTTPException(400,"الرسالة فارغة")
     users = await db("SELECT id FROM users WHERE role='student' AND is_active=TRUE") or []
     for usr in users:

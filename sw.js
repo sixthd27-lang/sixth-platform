@@ -1,5 +1,5 @@
 const CACHE = "sadis-v2";
-const ASSETS = ["/", "/index.html", "/manifest.json"];
+const ASSETS = ["./", "./index.html", "./manifest.json"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
@@ -17,7 +17,8 @@ self.addEventListener("activate", e => {
 
 self.addEventListener("fetch", e => {
   const url = new URL(e.request.url);
-  if (url.pathname.startsWith("/api") || url.pathname.startsWith("/auth")) return;
+  if (url.pathname.includes("/api") || url.pathname.includes("/auth")) return;
+  
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
@@ -27,7 +28,7 @@ self.addEventListener("fetch", e => {
           caches.open(CACHE).then(c => c.put(e.request, clone));
         }
         return res;
-      }).catch(() => caches.match("/index.html"));
+      }).catch(() => caches.match("./index.html"));
     })
   );
 });

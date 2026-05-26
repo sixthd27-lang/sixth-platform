@@ -2,7 +2,7 @@
   "name": "منصة السادس التعليمية",
   "short_name": "السادس",
   "description": "المنصة الأولى للطلاب في العراق",
-  "start_url": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#07090f",
   "theme_color": "#7c3aed",
@@ -10,8 +10,18 @@
   "lang": "ar",
   "dir": "rtl",
   "icons": [
-    {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-    {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
   "categories": ["education"]
 }

@@ -266,10 +266,10 @@ select.input{appearance:none}
 /* ══════════ Status Badge ══════════ */
 .sbadge{display:inline-flex;align-items:center;gap:4px;font-size:9px;
   font-weight:700;border-radius:20px;padding:3px 9px;border:1px solid transparent}
-.sb-act{background:rgba(16,185,129,.12);color:var(--green);border-color:rgba(16,185,129,.25)}
-.sb-exp{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.2)}
-.sb-ns {background:rgba(245,158,11,.1);color:var(--orange);border-color:rgba(245,158,11,.2)}
-.sb-sub{background:rgba(37,99,235,.12);color:var(--blue2);border-color:rgba(37,99,235,.2)}
+.sbadge.sb-act{background:rgba(16,185,129,.12);color:var(--green);border-color:rgba(16,185,129,.25)}
+.sbadge.sb-exp{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.2)}
+.sbadge.sb-ns {background:rgba(245,158,11,.1);color:var(--orange);border-color:rgba(245,158,11,.2)}
+.sbadge.sb-sub{background:rgba(37,99,235,.12);color:var(--blue2);border-color:rgba(37,99,235,.2)}
 </style>
 </head>
 <body>
@@ -278,7 +278,7 @@ select.input{appearance:none}
 const {useState,useEffect,useRef,useCallback} = React;
 
 // ══════════════════════════════════════════════════════════════
-//  Config  ← تم التحديث برابط Render الحقيقي بنجاح
+//  Config
 // ══════════════════════════════════════════════════════════════
 const API = window.location.hostname === "localhost"
   ? "http://localhost:8000"
@@ -346,10 +346,10 @@ function Toast({t}){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  Spinner / Skeleton
+//  Spinner / Skeleton — (تم تصحيح السهم المفقود هنا)
 // ══════════════════════════════════════════════════════════════
 const Sp=()=><div className="spin"/>;
-const Skel=()=(
+const Skel=()=> (
   <div style={{padding:4}}>
     <div className="sk sk-lg" style={{marginBottom:10,borderRadius:12}}/>
     <div className="sk sk-h"/><div className="sk sk-h" style={{width:"70%"}}/>
@@ -621,7 +621,7 @@ function ExamCard({exam,toast,onRefresh}){
     setLoading(true);
     try{
       const d=await api(`/api/exams/${exam.id}/start`,{method:"POST"});
-      if(d.status==="submitted"){toast("لقد سلّمت هذا الامتحان مسبقاً","i");setStatus("submitted");return;}
+      if(d.status==="submitted"){toast("لقد سلّمت هذا امتحان مسبقاً","i");setStatus("submitted");return;}
       if(d.status==="expired"){toast("انتهى وقت الامتحان","e");setStatus("expired");return;}
       setStatus("started");setRem(d.remaining||exam.duration_minutes*60);
       toast("✅ بدأ الامتحان! الوقت يسير…","s");
@@ -702,6 +702,9 @@ function ExamCard({exam,toast,onRefresh}){
   );
 }
 
+// ══════════════════════════════════════════════════════════════
+//  Exams List
+// ══════════════════════════════════════════════════════════════
 function ExamsPage({toast}){
   const[exams,setExams]=useState(null);
   const load=()=>api("/api/exams").then(d=>setExams(d.exams||[])).catch(e=>toast(e.message,"e"));

@@ -278,12 +278,12 @@ select.input{appearance:none}
 const {useState,useEffect,useRef,useCallback} = React;
 
 // ══════════════════════════════════════════════════════════════
-//  Config  ← غيّر هذا برابط Render الحقيقي
+//  Config  ← تم التحديث برابط Render الحقيقي بنجاح
 // ══════════════════════════════════════════════════════════════
-const API = window.location.hostname==="localhost"
+const API = window.location.hostname === "localhost"
   ? "http://localhost:8000"
-  : "https://YOUR-RENDER-APP.onrender.com";
-
+  : "https://sixth-platform.onrender.com";
+  
 const SUBJECTS = {
   arabic:   {n:"اللغة العربية",   i:"📖",c:"rgba(52,152,219,.18)"},
   islamic:  {n:"التربية الإسلامية",i:"🕌",c:"rgba(46,204,113,.15)"},

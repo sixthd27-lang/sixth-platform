@@ -31,7 +31,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);
   -webkit-font-smoothing:antialiased}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px}
-
+ 
 /* ══════════ Animations ══════════ */
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes slideR{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
@@ -41,10 +41,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);
                 50%{box-shadow:0 0 40px rgba(124,58,237,.55)}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-
+@keyframes countUp{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+@keyframes borderGlow{0%,100%{border-color:rgba(124,58,237,.3)}
+                      50%{border-color:rgba(124,58,237,.8)}}
+ 
 .au{animation:fadeUp .3s ease forwards}
 .as{animation:slideR .25s ease forwards}
-
+ 
 /* ══════════ Layout ══════════ */
 #root{height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .pages{flex:1;overflow:hidden;position:relative}
@@ -52,37 +55,37 @@ html,body{height:100%;overflow:hidden;background:var(--bg);
   opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
   transform:translateY(8px)}
 .page.active{opacity:1;pointer-events:auto;transform:none}
-
+ 
 /* ══════════ Card ══════════ */
 .card{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);
   padding:15px;margin-bottom:10px;transition:border-color .2s}
 .card:active{transform:scale(.985)}
 .card.glow{animation:borderGlow 3s infinite;box-shadow:0 4px 30px rgba(124,58,237,.12)}
-
+ 
 /* ══════════ Glass ══════════ */
 .glass{background:rgba(13,17,23,.75);backdrop-filter:blur(24px);
   -webkit-backdrop-filter:blur(24px);border:1px solid var(--b1)}
-
+ 
 /* ══════════ Skeleton ══════════ */
 .sk{background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);
   background-size:200%;animation:shimmer 1.4s infinite;border-radius:var(--r3)}
 .sk-h{height:18px;margin-bottom:8px}
 .sk-lg{height:60px}.sk-sm{height:10px;width:55%}
-
+ 
 /* ══════════ Neon Heading ══════════ */
 .neon-title{
   background:linear-gradient(135deg,var(--p2),var(--blue2),var(--cyan));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   font-weight:900;
 }
-
+ 
 /* ══════════ Progress ══════════ */
 .prog{background:rgba(255,255,255,.05);border-radius:20px;overflow:hidden}
 .prog-fill{height:100%;border-radius:20px;
   background:linear-gradient(90deg,var(--p),var(--blue2),var(--cyan));
   transition:width 1s cubic-bezier(.4,0,.2,1);
   box-shadow:0 0 12px rgba(124,58,237,.4)}
-
+ 
 /* ══════════ Stat ══════════ */
 .stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .stat{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);
@@ -91,7 +94,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);
   background:linear-gradient(135deg,var(--p2),var(--blue2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .stat-k{font-size:9px;color:var(--t2);margin-top:2px;font-weight:600}
-
+ 
 /* ══════════ Buttons ══════════ */
 .btn{width:100%;padding:13px;border:none;border-radius:var(--r2);
   font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;
@@ -103,7 +106,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);
 .btn-outline{background:transparent;border:1px solid var(--b2);color:var(--text)}
 .btn-danger{background:linear-gradient(135deg,var(--red),#c0392b);color:#fff}
 .btn-sm{width:auto;padding:7px 14px;font-size:11px}
-
+ 
 /* ══════════ Input ══════════ */
 .input{width:100%;padding:12px 14px;background:var(--s2);
   border:1px solid var(--b1);border-radius:var(--r2);
@@ -111,15 +114,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);
   outline:none;transition:border-color .2s,box-shadow .2s}
 .input:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(124,58,237,.15)}
 textarea.input{resize:none;height:80px}
+select.input{appearance:none}
 .form-group{margin-bottom:12px}
 .form-label{font-size:11px;color:var(--t2);font-weight:700;margin-bottom:5px;display:block}
-
+ 
 /* ══════════ Hero Banner ══════════ */
 .hero{border-radius:var(--r);padding:20px;margin-bottom:12px;
   position:relative;overflow:hidden;
   background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(37,99,235,.12),rgba(6,182,212,.08));
   border:1px solid rgba(124,58,237,.22)}
-
+.hero::before{content:'';position:absolute;top:-30px;right:-20px;
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,.22),transparent)}
+.hero::after{content:'';position:absolute;bottom:-20px;left:-20px;
+  width:80px;height:80px;border-radius:50%;
+  background:radial-gradient(circle,rgba(6,182,212,.18),transparent)}
+ 
 /* ══════════ Subject Grid ══════════ */
 .subj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
 .subj-card{border-radius:var(--r);padding:18px 14px;text-align:center;
@@ -129,7 +139,7 @@ textarea.input{resize:none;height:80px}
 .subj-icon{font-size:30px;margin-bottom:8px}
 .subj-name{font-size:12px;font-weight:700;line-height:1.3}
 .subj-cnt{font-size:10px;color:var(--t2);margin-top:4px}
-
+ 
 /* ══════════ Content Item ══════════ */
 .ci{display:flex;align-items:center;gap:10px;padding:13px;
   background:var(--card);border:1px solid var(--b1);
@@ -146,31 +156,34 @@ textarea.input{resize:none;height:80px}
 .ci-badge{font-size:9px;font-weight:700;border-radius:6px;padding:2px 8px;
   background:rgba(124,58,237,.12);color:var(--p2);border:1px solid rgba(124,58,237,.18);
   flex-shrink:0}
-
+ 
 /* ══════════ Exam Card ══════════ */
 .exam-card{background:linear-gradient(135deg,var(--card),rgba(37,99,235,.06));
   border:1px solid rgba(37,99,235,.2);border-radius:var(--r);
   padding:16px;margin-bottom:10px}
-.exam-card.active-exam{border-color:rgba(124,58,237,.35)}
+.exam-card.active-exam{border-color:rgba(124,58,237,.35);
+  animation:borderGlow 3s infinite}
 .timer{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums;
   letter-spacing:1px;min-width:72px;text-align:center}
 .timer.ok{color:var(--green)}
 .timer.warn{color:var(--orange)}
 .timer.crit{color:var(--red);animation:pulse2 1s infinite}
-
+ 
 /* ══════════ Leaderboard ══════════ */
 .lb{display:flex;align-items:center;gap:10px;padding:13px;
   background:var(--card);border:1px solid var(--b1);
   border-radius:var(--r2);margin-bottom:8px}
 .lb.gold{background:linear-gradient(135deg,rgba(251,191,36,.07),transparent);
          border-color:rgba(251,191,36,.2);animation:glow 3s infinite}
+.lb.silver{border-color:rgba(192,192,192,.15)}
+.lb.bronze{border-color:rgba(205,127,50,.15)}
 .lb-rank{width:30px;font-size:17px;font-weight:900;text-align:center;flex-shrink:0}
 .lb-av{width:42px;height:42px;border-radius:12px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;font-size:23px}
 .lb-xp{font-size:13px;font-weight:900;
   background:linear-gradient(135deg,var(--gold),var(--orange));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-
+ 
 /* ══════════ Profile ══════════ */
 .prof-hero{border-radius:var(--r);padding:22px;margin-bottom:12px;text-align:center;
   background:linear-gradient(135deg,rgba(124,58,237,.16),rgba(37,99,235,.1));
@@ -179,15 +192,15 @@ textarea.input{resize:none;height:80px}
   display:flex;align-items:center;justify-content:center;font-size:36px;
   animation:float 3s ease-in-out infinite;
   box-shadow:0 0 30px rgba(124,58,237,.35)}
-
+ 
 /* ══════════ Notification Badge ══════════ */
 .nb{position:absolute;top:3px;right:2px;width:8px;height:8px;
   border-radius:50%;background:var(--red);animation:pulse2 2s infinite}
-
+ 
 /* ══════════ Section Title ══════════ */
 .sec{font-size:10px;font-weight:800;color:var(--t2);
   text-transform:uppercase;letter-spacing:.6px;margin:14px 0 8px}
-
+ 
 /* ══════════ Nav ══════════ */
 .nav{height:64px;background:var(--s1);border-top:1px solid var(--b1);
   display:flex;align-items:center;padding:0 4px;z-index:10;
@@ -200,12 +213,12 @@ textarea.input{resize:none;height:80px}
 .nav-label{font-size:9px;color:var(--t2);font-weight:700;transition:color .2s}
 .nav-item.active .nav-icon{transform:scale(1.2)}
 .nav-item.active .nav-label{color:var(--p2)}
-
+ 
 /* ══════════ Back bar ══════════ */
 .back{display:flex;align-items:center;gap:8px;padding:8px 0 14px;
   cursor:pointer;opacity:.8;transition:opacity .15s}
 .back:active{opacity:.5}
-
+ 
 /* ══════════ Toast ══════════ */
 .toast-wrap{position:fixed;top:16px;left:50%;
   transform:translateX(-50%) translateY(-80px);
@@ -217,16 +230,39 @@ textarea.input{resize:none;height:80px}
 .toast-s{border-color:var(--green)!important;color:var(--green)}
 .toast-e{border-color:var(--red)!important;color:var(--red)}
 .toast-i{border-color:var(--blue2)!important;color:var(--blue2)}
-
+ 
 /* ══════════ Spinner ══════════ */
 .spin{width:30px;height:30px;border:3px solid var(--b1);
   border-top-color:var(--p);border-radius:50%;
   animation:spin .7s linear infinite;margin:28px auto}
-
+ 
 /* ══════════ Empty ══════════ */
 .empty{text-align:center;padding:40px 16px;color:var(--t2)}
 .empty-icon{font-size:40px;margin-bottom:12px}
-
+ 
+/* ══════════ Admin Table ══════════ */
+.admin-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.admin-card{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);
+  padding:18px;text-align:center;cursor:pointer;transition:all .18s}
+.admin-card:active{transform:scale(.95);background:var(--card2)}
+.admin-icon{font-size:28px;margin-bottom:8px}
+.admin-label{font-size:12px;font-weight:700}
+ 
+/* ══════════ Landing ══════════ */
+.land{min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:32px 24px;background:var(--bg);
+  position:relative;overflow:hidden}
+.land::before{content:'';position:absolute;top:10%;right:-10%;
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,.12),transparent)}
+.land::after{content:'';position:absolute;bottom:10%;left:-10%;
+  width:250px;height:250px;border-radius:50%;
+  background:radial-gradient(circle,rgba(37,99,235,.1),transparent)}
+ 
+/* ══════════ Neon Line ══════════ */
+.nline{height:1px;background:linear-gradient(90deg,transparent,var(--p),var(--cyan),transparent);
+  margin:14px 0;opacity:.4}
+ 
 /* ══════════ Status Badge ══════════ */
 .sbadge{display:inline-flex;align-items:center;gap:4px;font-size:9px;
   font-weight:700;border-radius:20px;padding:3px 9px;border:1px solid transparent}
@@ -240,22 +276,29 @@ textarea.input{resize:none;height:80px}
 <div id="root"></div>
 <script type="text/babel">
 const {useState,useEffect,useRef,useCallback} = React;
-
+ 
+// ══════════════════════════════════════════════════════════════
+//  Config  ← غيّر هذا برابط Render الحقيقي
+// ══════════════════════════════════════════════════════════════
 const API = window.location.hostname==="localhost"
   ? "http://localhost:8000"
-  : "https://sixth-platform.onrender.com";
-
+  : "https://YOUR-RENDER-APP.onrender.com";
+ 
 const SUBJECTS = {
   arabic:   {n:"اللغة العربية",   i:"📖",c:"rgba(52,152,219,.18)"},
   islamic:  {n:"التربية الإسلامية",i:"🕌",c:"rgba(46,204,113,.15)"},
   english:  {n:"اللغة الإنكليزية",i:"🌍",c:"rgba(99,110,114,.18)"},
   math:     {n:"الرياضيات",       i:"📐",c:"rgba(124,58,237,.18)"},
-  biology:  {n:"الأحياء",          i:"🧬",c:"rgba(26,188,156,.15)"},
-  chemistry:{n:"الكيمياء",         i:"⚗️",c:"rgba(245,158,11,.12)"},
-  physics:  {n:"الفيزياء",         i:"⚡",c:"rgba(239,68,68,.12)"},
+  biology:  {n:"الأحياء",         i:"🧬",c:"rgba(26,188,156,.15)"},
+  chemistry:{n:"الكيمياء",        i:"⚗️",c:"rgba(245,158,11,.12)"},
+  physics:  {n:"الفيزياء",        i:"⚡",c:"rgba(239,68,68,.12)"},
 };
 const THRESH=[0,100,300,700,1500,3000,5000,8000,12000,18000,25000];
-
+ 
+// ══════════════════════════════════════════════════════════════
+//  API Helper
+// ══════════════════════════════════════════════════════════════
+let _tok = localStorage.getItem("_t")||"";
 async function api(path,opts={}){
   const r=await fetch(API+path,{
     ...opts,
@@ -267,7 +310,10 @@ async function api(path,opts={}){
   if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||`${r.status}`);}
   return r.json();
 }
-
+ 
+// ══════════════════════════════════════════════════════════════
+//  Utils
+// ══════════════════════════════════════════════════════════════
 function xpInfo(xp){
   const t=THRESH; let l=1;
   for(let i=t.length-1;i>=0;i--){if(xp>=t[i]){l=i+1;break;}}
@@ -277,7 +323,10 @@ function xpInfo(xp){
 }
 const fmtN=n=>n>=1000?(n/1000).toFixed(1)+"K":String(n);
 const fmtT=s=>{if(s<=0)return"00:00";const m=Math.floor(s/60),ss=s%60;return`${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}`};
-
+ 
+// ══════════════════════════════════════════════════════════════
+//  Toast Hook
+// ══════════════════════════════════════════════════════════════
 function useToast(){
   const[t,setT]=useState({msg:"",type:"i",show:false});
   const tm=useRef();
@@ -295,7 +344,10 @@ function Toast({t}){
     </div>
   );
 }
-
+ 
+// ══════════════════════════════════════════════════════════════
+//  Spinner / Skeleton
+// ══════════════════════════════════════════════════════════════
 const Sp=()=><div className="spin"/>;
 const Skel=()=>(
   <div style={{padding:4}}>
@@ -304,16 +356,18 @@ const Skel=()=>(
     <div className="sk sk-h" style={{marginTop:10}}/><div className="sk sk-sm"/>
   </div>
 );
-
-let _tok = localStorage.getItem("_t")||"";
-
+ 
+// ══════════════════════════════════════════════════════════════
+//  Auth — Login / Register
+// ══════════════════════════════════════════════════════════════
 function AuthPage({onLogin}){
   const[mode,setMode]=useState("login");
   const[form,setForm]=useState({full_name:"",username:"",password:"",school_name:"",class_code:""});
   const[loading,setLoading]=useState(false);
   const[err,setErr]=useState("");
   const set=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
-
+ 
+  // تحقق من التوكن المحفوظ
   useEffect(()=>{
     const t=localStorage.getItem("_t");
     if(!t)return;
@@ -323,7 +377,7 @@ function AuthPage({onLogin}){
       onLogin(u?JSON.parse(u):{user_id:data.id,role:data.role,full_name:data.full_name});
     }).catch(()=>{localStorage.removeItem("_t");localStorage.removeItem("_u");});
   },[]);
-
+ 
   const submit=async()=>{
     setLoading(true);setErr("");
     try{
@@ -340,7 +394,7 @@ function AuthPage({onLogin}){
     }catch(e){setErr(e.message);}
     setLoading(false);
   };
-
+ 
   return(
     <div className="land">
       <div style={{textAlign:"center",marginBottom:32,position:"relative",zIndex:1}}>
@@ -348,7 +402,7 @@ function AuthPage({onLogin}){
         <div style={{fontSize:24,fontWeight:900}} className="neon-title">منصة السادس التعليمية</div>
         <div style={{fontSize:12,color:"var(--t2)",marginTop:8}}>المنصة الأولى للطلاب في العراق</div>
       </div>
-
+ 
       <div style={{width:"100%",maxWidth:380,position:"relative",zIndex:1}}>
         <div className="card" style={{background:"rgba(13,17,23,.9)"}}>
           <div style={{display:"flex",gap:8,marginBottom:20}}>
@@ -359,7 +413,7 @@ function AuthPage({onLogin}){
               </button>
             ))}
           </div>
-
+ 
           {mode==="register"&&(
             <>
               <div className="form-group">
@@ -389,7 +443,10 @@ function AuthPage({onLogin}){
     </div>
   );
 }
-
+ 
+// ══════════════════════════════════════════════════════════════
+//  Home
+// ══════════════════════════════════════════════════════════════
 function HomePage({profile,goPage}){
   if(!profile)return<Sp/>;
   const{xp=0,level=1,badge="🥉",full_name="",done_lec=0,done_exam=0,rank_pos}=profile;
@@ -407,13 +464,13 @@ function HomePage({profile,goPage}){
           </div>
         </div>
       </div>
-
+ 
       <div className="stats3">
         <div className="stat"><div className="stat-v">{fmtN(xp)}</div><div className="stat-k">⭐ XP</div></div>
         <div className="stat"><div className="stat-v">{level}</div><div className="stat-k">🏅 المستوى</div></div>
         <div className="stat"><div className="stat-v">{rank_pos?`#${rank_pos}`:"—"}</div><div className="stat-k">🏆 الترتيب</div></div>
       </div>
-
+ 
       <div className="card">
         <div style={{display:"flex",justifyContent:"space-between",marginBottom:7}}>
           <span style={{fontSize:12,fontWeight:700}}>التقدم للمستوى التالي</span>
@@ -426,7 +483,7 @@ function HomePage({profile,goPage}){
           {pr.needed>0?`يلزمك ${pr.needed.toLocaleString("ar")} XP للمستوى ${level+1}`:"🎉 أعلى مستوى!"}
         </div>
       </div>
-
+ 
       <div className="sec">الأقسام الرئيسية</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8,marginBottom:14}}>
         {[
@@ -443,7 +500,7 @@ function HomePage({profile,goPage}){
           </div>
         ))}
       </div>
-
+ 
       <div className="card">
         <div className="sec" style={{margin:"0 0 10px"}}>إحصائياتك</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
@@ -460,25 +517,28 @@ function HomePage({profile,goPage}){
     </div>
   );
 }
-
-function LecturesPage({toast, onRefreshProfile}){
+ 
+// ══════════════════════════════════════════════════════════════
+//  Lectures
+// ══════════════════════════════════════════════════════════════
+function LecturesPage({toast}){
   const[data,setData]=useState(null);
   const[sel,setSel]=useState(null);
   const[loading,setLoading]=useState(true);
-
+ 
   useEffect(()=>{
     api("/api/lectures").then(d=>{setData(d.lectures||{});setLoading(false);})
     .catch(e=>{toast(e.message,"e");setLoading(false);});
   },[]);
-
+ 
   const open=async(lec)=>{
-    api(`/api/lectures/${lec.id}/done`,{method:"POST"}).then(()=>onRefreshProfile()).catch(()=>{});
+    api(`/api/lectures/${lec.id}/done`,{method:"POST"}).catch(()=>{});
     if(lec.url) window.open(lec.url,"_blank");
     else toast("لا يوجد رابط لهذه المحاضرة","i");
   };
-
+ 
   if(loading)return<Skel/>;
-
+ 
   if(sel){
     const items=(data[sel]||[]);
     const info=SUBJECTS[sel]||{n:sel,i:"📚"};
@@ -514,7 +574,7 @@ function LecturesPage({toast, onRefreshProfile}){
       </div>
     );
   }
-
+ 
   return(
     <div className="au">
       <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
@@ -536,14 +596,17 @@ function LecturesPage({toast, onRefreshProfile}){
     </div>
   );
 }
-
+ 
+// ══════════════════════════════════════════════════════════════
+//  Exam Card with live timer
+// ══════════════════════════════════════════════════════════════
 function ExamCard({exam,toast,onRefresh}){
   const[status,setStatus]=useState(exam.my_status||"not_started");
   const[rem,setRem]=useState(exam.remaining||0);
   const[loading,setLoading]=useState(false);
   const ti=useRef();
   const subj=SUBJECTS[exam.subject_key]||{n:exam.subject_key,i:"📝"};
-
+ 
   useEffect(()=>{
     if(status!=="started"||rem<=0)return;
     ti.current=setInterval(()=>{
@@ -554,7 +617,7 @@ function ExamCard({exam,toast,onRefresh}){
     },1000);
     return()=>clearInterval(ti.current);
   },[status]);
-
+ 
   const start=async()=>{
     setLoading(true);
     try{
@@ -566,7 +629,7 @@ function ExamCard({exam,toast,onRefresh}){
     }catch(e){toast(e.message,"e");}
     setLoading(false);
   };
-
+ 
   const submit=async()=>{
     if(rem<=0){toast("انتهى الوقت!","e");return;}
     setLoading(true);
@@ -574,15 +637,14 @@ function ExamCard({exam,toast,onRefresh}){
       await api("/api/exams/submit",{method:"POST",body:{exam_id:exam.id,answer_text:"تم التسليم"}});
       setStatus("submitted");clearInterval(ti.current);
       toast("✅ تم التسليم! +30 XP 🎉","s");
-      if(onRefresh) onRefresh();
     }catch(e){toast(e.message,"e");}
     setLoading(false);
   };
-
+ 
   const total=exam.duration_minutes*60;
   const pct=total>0?Math.round((rem/total)*100):0;
   const warn=rem<60?"crit":rem<total*.25?"warn":"ok";
-
+ 
   return(
     <div className={`exam-card ${status==="started"?"active-exam":""}`}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
@@ -639,150 +701,448 @@ function ExamCard({exam,toast,onRefresh}){
     </div>
   );
 }
-
-function ExamsPage({toast, onRefreshProfile}){
+ 
+function ExamsPage({toast}){
   const[exams,setExams]=useState(null);
   const load=()=>api("/api/exams").then(d=>setExams(d.exams||[])).catch(e=>toast(e.message,"e"));
-  
   useEffect(()=>{load();},[]);
-  
-  const handleRefresh = () => {
-    load();
-    if(onRefreshProfile) onRefreshProfile();
-  };
-
   if(!exams)return<Skel/>;
-  
   return(
     <div className="au">
       <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
-        📝 <span className="neon-title">الامتحانات المتاحة</span>
+        📝 <span className="neon-title">الامتحانات</span>
       </div>
-      {!exams.length ? (
-        <div className="empty"><div className="empty-icon">🎉</div>لا توجد امتحانات حالياً</div>
-      ) : (
-        exams.map(exam => (
-          <ExamCard key={exam.id} exam={exam} toast={toast} onRefresh={handleRefresh} />
-        ))
-      )}
+      {!exams.length?<div className="empty"><div className="empty-icon">📭</div>لا توجد امتحانات نشطة</div>
+      :exams.map(e=><ExamCard key={e.id} exam={e} toast={toast} onRefresh={load}/>)}
     </div>
   );
 }
-
+ 
+// ══════════════════════════════════════════════════════════════
+//  Leaderboard
+// ══════════════════════════════════════════════════════════════
 function LeaderboardPage({toast}){
-  const[list,setList]=useState(null);
-  useEffect(()=>{
-    api("/api/leaderboard").then(d=>setList(d.leaderboard||[])).catch(e=>toast(e.message,"e"));
-  },[]);
-
-  if(!list)return<Sp/>;
-
+  const[rows,setRows]=useState(null);
+  useEffect(()=>{api("/api/leaderboard?limit=20").then(d=>setRows(d.leaderboard||[])).catch(e=>toast(e.message,"e"));},[]);
+  if(!rows)return<Skel/>;
+  const bgs={
+    0:"linear-gradient(135deg,#fbbf24,#f59e0b)",
+    1:"linear-gradient(135deg,#9ca3af,#6b7280)",
+    2:"linear-gradient(135deg,#cd7f32,#a0522d)",
+  };
+  const medals=["🥇","🥈","🥉"];
   return(
     <div className="au">
       <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
-        🏆 <span className="neon-title">لوحة الصدارة (الأوائل)</span>
+        🏆 <span className="neon-title">لوحة الأوائل</span>
       </div>
-      {list.map((u,idx)=>{
-        const rank = idx + 1;
-        const cls = rank===1?"gold":rank===2?"silver":rank===3?"bronze":"";
-        return(
-          <div key={u.user_id||idx} className={`lb ${cls}`}>
-            <div className="lb-rank">{rank===1?"🥇":rank===2?"🥈":rank===3?"🥉":rank}</div>
-            <div className="lb-av" style={{background:"var(--s2)"}}>👤</div>
-            <div style={{flex:1,minWidth:0}}>
-              <div style={{fontSize:13,fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{u.full_name}</div>
-              <div style={{fontSize:10,color:"var(--t2)"}}>{u.school_name||"طالب في المنصة"} • مستوى {u.level||1}</div>
-            </div>
-            <div className="lb-xp">{u.xp?.toLocaleString("ar")} XP</div>
+      {!rows.length?<div className="empty"><div className="empty-icon">📊</div>لا توجد بيانات</div>
+      :rows.map((r,i)=>(
+        <div key={r.user_id} className={`lb ${i===0?"gold":i===1?"silver":i===2?"bronze":""}`}>
+          <div className="lb-rank">{medals[i]||`${i+1}.`}</div>
+          <div className="lb-av" style={{background:bgs[i]||"var(--card2)"}}>{r.badge||"🥉"}</div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:13,fontWeight:700}}>{r.full_name||"—"}</div>
+            <div style={{fontSize:10,color:"var(--t2)"}}>LVL {r.level||1}{r.school_name?` • ${r.school_name}`:""}</div>
           </div>
-        );
-      })}
+          <div className="lb-xp">{(r.xp||0).toLocaleString("ar")}</div>
+        </div>
+      ))}
     </div>
   );
 }
-
-function ProfilePage({profile,onLogout}){
-  if(!profile)return<Sp/>;
+ 
+// ══════════════════════════════════════════════════════════════
+//  Profile
+// ══════════════════════════════════════════════════════════════
+function ProfilePage({profile,toast,onRefresh,onLogout}){
+  if(!profile)return<Skel/>;
+  const{xp=0,level=1,badge="🥉",full_name,rank_pos,school_name,done_lec=0,done_exam=0,progress={}}=profile;
+  const pr=progress.pct!=null?progress:xpInfo(xp);
+  const bgs={"👑":"linear-gradient(135deg,#fbbf24,#ef4444)","💎":"linear-gradient(135deg,#06b6d4,#2563eb)","🥇":"linear-gradient(135deg,#fbbf24,#f59e0b)","🥈":"linear-gradient(135deg,#9ca3af,#6b7280)","🥉":"linear-gradient(135deg,#cd7f32,#a0522d)"};
   return(
     <div className="au">
       <div className="prof-hero">
-        <div className="prof-av">👤</div>
-        <div style={{fontSize:18,fontWeight:900}}>{profile.full_name}</div>
-        <div style={{fontSize:11,color:"var(--t2)",marginTop:4}}>@{profile.username}</div>
+        <div className="prof-av" style={{background:bgs[badge]||"linear-gradient(135deg,var(--p),var(--blue))"}}>
+          {badge}
+        </div>
+        <div style={{fontSize:18,fontWeight:900}}>{full_name||"—"}</div>
+        <div style={{fontSize:11,color:"var(--t2)",marginTop:4}}>
+          {rank_pos?`🏆 الترتيب: #${rank_pos}`:`المستوى ${level}`}
+        </div>
+      </div>
+      <div className="stats3">
+        <div className="stat"><div className="stat-v">{fmtN(xp)}</div><div className="stat-k">⭐ XP</div></div>
+        <div className="stat"><div className="stat-v">{level}</div><div className="stat-k">🏅 المستوى</div></div>
+        <div className="stat"><div className="stat-v">{done_lec}</div><div className="stat-k">📚 محاضرة</div></div>
       </div>
       <div className="card">
-        <div style={{fontSize:13,fontWeight:700,marginBottom:10}}>معلومات الحساب</div>
-        <div style={{fontSize:12,color:"var(--t2)",marginBottom:6}}>المدرسة: <span style={{color:"var(--text)"}}>{profile.school_name||"—"}</span></div>
-        <div style={{fontSize:12,color:"var(--t2)"}}>تاريخ الانضمام: <span style={{color:"var(--text)"}}>{profile.created_at?new Date(profile.created_at).toLocaleDateString("ar-IQ"):"—"}</span></div>
+        <div style={{fontSize:12,fontWeight:700,marginBottom:8}}>📈 التقدم للمستوى التالي</div>
+        <div className="prog" style={{height:10}}>
+          <div className="prog-fill" style={{width:`${pr.pct}%`}}/>
+        </div>
+        <div style={{display:"flex",justifyContent:"space-between",marginTop:5,fontSize:10,color:"var(--t2)"}}>
+          <span>{xp.toLocaleString("ar")} XP</span>
+          <span>{pr.pct}%</span>
+          <span>{(pr.next||0).toLocaleString("ar")} XP</span>
+        </div>
       </div>
+      <div className="sec">معلومات</div>
+      <div className="card">
+        {[["🏫","المدرسة",school_name||"—"],["📝","الامتحانات المقدمة",done_exam],["🏅","المستوى الحالي",`${badge} LVL ${level}`]].map(([i,k,v])=>(
+          <div key={k} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderBottom:"1px solid var(--b1)"}}>
+            <span style={{fontSize:19,width:28}}>{i}</span>
+            <div>
+              <div style={{fontSize:10,color:"var(--t2)"}}>{k}</div>
+              <div style={{fontSize:13,fontWeight:700}}>{v}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="nline"/>
       <button className="btn btn-danger" onClick={onLogout}>🚪 تسجيل الخروج</button>
     </div>
   );
 }
-
-function App(){
-  const[user,setUser]=useState(null);
-  const[page,setPage]=useState("home");
-  const[profile,setProfile]=useState(null);
-  const[t,showToast]=useToast();
-
-  const refreshProfile=useCallback(()=>{
-    if(!user)return;
-    api("/auth/me").then(d=>setProfile(d)).catch(()=>{});
-  },[user]);
-
+ 
+// ══════════════════════════════════════════════════════════════
+//  Notifications
+// ══════════════════════════════════════════════════════════════
+function NotifsPage({toast}){
+  const[notifs,setNotifs]=useState(null);
   useEffect(()=>{
-    if(user) refreshProfile();
-  },[user, refreshProfile]);
-
-  const logout=()=>{
-    localStorage.removeItem("_t");
-    localStorage.removeItem("_u");
-    _tok="";
-    setUser(null);
-    setProfile(null);
-    setPage("home");
-  };
-
-  if(!user) return <><Toast t={t}/><AuthPage onLogin={setUser}/></>;
-
-  const pages={
-    home:<HomePage profile={profile} goPage={setPage}/>,
-    lectures:<LecturesPage toast={showToast} onRefreshProfile={refreshProfile}/>,
-    exams:<ExamsPage toast={showToast} onRefreshProfile={refreshProfile}/>,
-    leaderboard:<LeaderboardPage toast={showToast}/>,
-    profile:<ProfilePage profile={profile} onLogout={logout}/>
-  };
-
+    api("/api/notifications").then(d=>{
+      setNotifs(d.notifications||[]);
+      api("/api/notifications/read",{method:"POST"}).catch(()=>{});
+    }).catch(e=>toast(e.message,"e"));
+  },[]);
+  const icons={success:"✅",info:"ℹ️",exam:"📝",lecture:"📚",warning:"⚠️"};
+  if(!notifs)return<Skel/>;
   return(
-    <div id="root">
-      <Toast t={t}/>
-      <div className="pages">
-        <div className={`page ${page==="home"?"active":""}`}>{pages.home}</div>
-        <div className={`page ${page==="lectures"?"active":""}`}>{page==="lectures"&&pages.lectures}</div>
-        <div className={`page ${page==="exams"?"active":""}`}>{page==="exams"&&pages.exams}</div>
-        <div className={`page ${page==="leaderboard"?"active":""}`}>{page==="leaderboard"&&pages.leaderboard}</div>
-        <div className={`page ${page==="profile"?"active":""}`}>{pages.profile}</div>
+    <div className="au">
+      <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
+        🔔 <span className="neon-title">الإشعارات</span>
       </div>
-      <nav className="nav glass">
-        {[
-          {id:"home",i:"🏠",l:"الرئيسية"},
-          {id:"lectures",i:"📚",l:"المحاضرات"},
-          {id:"exams",i:"📝",l:"الامتحانات"},
-          {id:"leaderboard",i:"🏆",l:"الأوائل"},
-          {id:"profile",i:"👤",l:"ملفي"},
-        ].map(t=>(
-          <div key={t.id} className={`nav-item ${page===t.id?"active":""}`} onClick={()=>setPage(t.id)}>
-            <span className="nav-icon">{t.i}</span>
-            <span className="nav-label">{t.l}</span>
+      {!notifs.length?<div className="empty"><div className="empty-icon">🔕</div>لا توجد إشعارات</div>
+      :notifs.map(n=>(
+        <div key={n.id} className="ci" style={{cursor:"default",opacity:n.is_read?.8:1}}>
+          <div className="ci-ico" style={{background:"var(--s2)",fontSize:22}}>{icons[n.type]||"🔔"}</div>
+          <div className="ci-body">
+            <div className="ci-title">{n.title}</div>
+            <div className="ci-sub">{n.message}</div>
+            <div style={{fontSize:9,color:"var(--t3)",marginTop:3}}>
+              {new Date(n.created_at).toLocaleDateString("ar-IQ")}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+ 
+// ══════════════════════════════════════════════════════════════
+//  Admin Panel
+// ══════════════════════════════════════════════════════════════
+function AdminPage({toast}){
+  const[view,setView]=useState("main");
+  const[stats,setStats]=useState(null);
+  const[users,setUsers]=useState(null);
+  const[subs,setSubs]=useState(null);
+  const[form,setForm]=useState({});
+  const[loading,setLoading]=useState(false);
+  const set=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
+ 
+  useEffect(()=>{api("/api/admin/stats").then(setStats).catch(()=>{});},[]);
+ 
+  const addLec=async()=>{
+    if(!form.lec_title||!form.lec_subj){toast("أدخل العنوان والمادة","e");return;}
+    setLoading(true);
+    try{
+      await api("/api/lectures",{method:"POST",body:{title:form.lec_title,subject_key:form.lec_subj,
+        chapter:form.lec_chapter||"",description:form.lec_desc||"",url:form.lec_url||"",file_type:form.lec_type||"link"}});
+      toast("✅ تمت إضافة المحاضرة وإشعار الطلاب!","s");
+      setForm({});setView("main");
+    }catch(e){toast(e.message,"e");}
+    setLoading(false);
+  };
+ 
+  const addExam=async()=>{
+    if(!form.ex_title||!form.ex_subj){toast("أدخل العنوان والمادة","e");return;}
+    setLoading(true);
+    try{
+      await api("/api/exams",{method:"POST",body:{title:form.ex_title,subject_key:form.ex_subj,
+        duration_minutes:parseInt(form.ex_dur)||60,description:form.ex_desc||"",url:form.ex_url||""}});
+      toast("✅ تم إنشاء الامتحان وإشعار الطلاب!","s");
+      setForm({});setView("main");
+    }catch(e){toast(e.message,"e");}
+    setLoading(false);
+  };
+ 
+  const loadUsers=()=>{
+    api("/api/admin/users").then(d=>setUsers(d.users||[])).catch(e=>toast(e.message,"e"));
+    setView("users");
+  };
+ 
+  const broadcast=async()=>{
+    if(!form.bc_msg){toast("اكتب الرسالة","e");return;}
+    setLoading(true);
+    try{
+      const d=await api("/api/admin/broadcast",{method:"POST",body:{title:form.bc_title||"إشعار",message:form.bc_msg}});
+      toast(`✅ أُرسل إلى ${d.sent} طالب`,"s");setForm({});setView("main");
+    }catch(e){toast(e.message,"e");}
+    setLoading(false);
+  };
+ 
+  const updRanks=async()=>{
+    await api("/api/admin/ranks",{method:"POST"}).catch(()=>{});
+    toast("✅ تم تحديث الترتيب","s");
+    api("/api/admin/stats").then(setStats).catch(()=>{});
+  };
+ 
+  const SUBJECTS_OPTS=Object.entries(SUBJECTS).map(([k,v])=>(
+    <option key={k} value={k}>{v.i} {v.n}</option>
+  ));
+ 
+  if(view==="add_lec") return(
+    <div className="as">
+      <div className="back" onClick={()=>setView("main")}><span style={{fontSize:19}}>◀️</span><span style={{fontSize:12,color:"var(--t2)",fontWeight:700}}>رجوع</span></div>
+      <div style={{fontSize:17,fontWeight:900,marginBottom:14}}>📚 إضافة محاضرة</div>
+      <div className="card">
+        {[["lec_title","عنوان المحاضرة","نص"],["lec_url","رابط الملف أو الفيديو","نص"],["lec_chapter","اسم الفصل (اختياري)","نص"],["lec_desc","وصف (اختياري)","نص"]].map(([k,label,_])=>(
+          <div key={k} className="form-group">
+            <label className="form-label">{label}</label>
+            <input className="input" value={form[k]||""} onChange={set(k)} placeholder={label}/>
           </div>
         ))}
+        <div className="form-group">
+          <label className="form-label">المادة</label>
+          <select className="input" value={form.lec_subj||""} onChange={set("lec_subj")}>
+            <option value="">اختر المادة</option>{SUBJECTS_OPTS}
+          </select>
+        </div>
+        <div className="form-group">
+          <label className="form-label">نوع الملف</label>
+          <select className="input" value={form.lec_type||"link"} onChange={set("lec_type")}>
+            <option value="link">🔗 رابط</option>
+            <option value="pdf">📄 PDF</option>
+            <option value="video">🎬 فيديو</option>
+            <option value="image">🖼️ صورة</option>
+          </select>
+        </div>
+        <button className="btn btn-p" onClick={addLec} disabled={loading}>{loading?<Sp/>:"✅ إضافة المحاضرة"}</button>
+      </div>
+    </div>
+  );
+ 
+  if(view==="add_exam") return(
+    <div className="as">
+      <div className="back" onClick={()=>setView("main")}><span style={{fontSize:19}}>◀️</span><span style={{fontSize:12,color:"var(--t2)",fontWeight:700}}>رجوع</span></div>
+      <div style={{fontSize:17,fontWeight:900,marginBottom:14}}>📝 إضافة امتحان</div>
+      <div className="card">
+        {[["ex_title","عنوان الامتحان"],["ex_url","رابط ورقة الامتحان (اختياري)"],["ex_desc","وصف (اختياري)"]].map(([k,label])=>(
+          <div key={k} className="form-group">
+            <label className="form-label">{label}</label>
+            <input className="input" value={form[k]||""} onChange={set(k)} placeholder={label}/>
+          </div>
+        ))}
+        <div className="form-group">
+          <label className="form-label">المادة</label>
+          <select className="input" value={form.ex_subj||""} onChange={set("ex_subj")}>
+            <option value="">اختر المادة</option>{SUBJECTS_OPTS}
+          </select>
+        </div>
+        <div className="form-group">
+          <label className="form-label">مدة الامتحان (دقيقة)</label>
+          <input className="input" type="number" value={form.ex_dur||60} onChange={set("ex_dur")} min={5} max={300}/>
+        </div>
+        <button className="btn btn-p" onClick={addExam} disabled={loading}>{loading?<Sp/>:"✅ نشر الامتحان"}</button>
+      </div>
+    </div>
+  );
+ 
+  if(view==="broadcast") return(
+    <div className="as">
+      <div className="back" onClick={()=>setView("main")}><span style={{fontSize:19}}>◀️</span><span style={{fontSize:12,color:"var(--t2)",fontWeight:700}}>رجوع</span></div>
+      <div style={{fontSize:17,fontWeight:900,marginBottom:14}}>📢 بث جماعي</div>
+      <div className="card">
+        <div className="form-group"><label className="form-label">عنوان الإشعار</label>
+          <input className="input" value={form.bc_title||""} onChange={set("bc_title")} placeholder="مثال: إعلان مهم"/>
+        </div>
+        <div className="form-group"><label className="form-label">الرسالة</label>
+          <textarea className="input" value={form.bc_msg||""} onChange={set("bc_msg")} placeholder="اكتب رسالتك هنا…"/>
+        </div>
+        <button className="btn btn-p" onClick={broadcast} disabled={loading}>{loading?<Sp/>:"📢 إرسال للجميع"}</button>
+      </div>
+    </div>
+  );
+ 
+  if(view==="users") return(
+    <div className="as">
+      <div className="back" onClick={()=>setView("main")}><span style={{fontSize:19}}>◀️</span><span style={{fontSize:12,color:"var(--t2)",fontWeight:700}}>رجوع</span></div>
+      <div style={{fontSize:17,fontWeight:900,marginBottom:14}}>👥 الطلاب ({users?.length||0})</div>
+      {(users||[]).map(u=>(
+        <div key={u.id} className="ci" style={{cursor:"default"}}>
+          <div className="ci-ico" style={{background:"var(--s2)",fontSize:22}}>{u.badge||"🥉"}</div>
+          <div className="ci-body">
+            <div className="ci-title">{u.full_name}</div>
+            <div className="ci-sub">LVL {u.level||1} | {(u.xp||0).toLocaleString("ar")} XP | {u.school_name||"—"}</div>
+          </div>
+          <span style={{fontSize:10,color:"var(--t2)"}}>{u.username}</span>
+        </div>
+      ))}
+    </div>
+  );
+ 
+  return(
+    <div className="au">
+      <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
+        ⚙️ <span className="neon-title">لوحة الإدارة</span>
+      </div>
+      {stats&&(
+        <div className="stats3" style={{gridTemplateColumns:"repeat(2,1fr)",gap:8,marginBottom:14}}>
+          {[["👥",stats.students,"طالب"],["📚",stats.lectures,"محاضرة"],["📝",stats.exams,"امتحان"],["✅",stats.submissions,"إجابة"]].map(([i,v,k])=>(
+            <div key={k} className="stat"><div className="stat-v">{v}</div><div className="stat-k">{i} {k}</div></div>
+          ))}
+        </div>
+      )}
+      <div className="admin-grid">
+        {[
+          {i:"📚",n:"إضافة محاضرة",a:()=>setView("add_lec")},
+          {i:"📝",n:"إضافة امتحان",a:()=>setView("add_exam")},
+          {i:"👥",n:"الطلاب",a:loadUsers},
+          {i:"📢",n:"بث جماعي",a:()=>setView("broadcast")},
+          {i:"🏆",n:"تحديث الترتيب",a:updRanks},
+        ].map(({i,n,a})=>(
+          <div key={n} className="admin-card" onClick={a}>
+            <div className="admin-icon">{i}</div>
+            <div className="admin-label">{n}</div>
+          </div>
+        ))}
+      </div>
+      {stats?.top?.length>0&&(
+        <>
+          <div className="sec">أوائل الطلاب</div>
+          {stats.top.map((s,i)=>(
+            <div key={i} className="ci" style={{cursor:"default"}}>
+              <div className="ci-ico" style={{fontSize:20}}>{["🥇","🥈","🥉","4.","5."][i]}</div>
+              <div className="ci-body">
+                <div className="ci-title">{s.full_name}</div>
+                <div className="ci-sub">LVL {s.level} | {(s.xp||0).toLocaleString("ar")} XP</div>
+              </div>
+              <span style={{fontSize:20}}>{s.badge}</span>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+ 
+// ══════════════════════════════════════════════════════════════
+//  Main App
+// ══════════════════════════════════════════════════════════════
+function App(){
+  const[user,setUser]=useState(null);
+  const[profile,setProfile]=useState(null);
+  const[page,setPage]=useState("home");
+  const[hist,setHist]=useState([]);
+  const[notifCount,setNC]=useState(0);
+  const[t,showToast]=useToast();
+ 
+  const login=async(data)=>{
+    setUser(data);
+    try{
+      const p=await api("/api/profile");
+      setProfile(p);
+      api("/api/notifications").then(d=>setNC(d.unread||0)).catch(()=>{});
+    }catch(e){}
+  };
+ 
+  const logout=()=>{
+    localStorage.removeItem("_t");localStorage.removeItem("_u");
+    _tok="";setUser(null);setProfile(null);setPage("home");
+  };
+ 
+  const goPage=(name,push=true)=>{
+    if(push&&page!==name) setHist(h=>[...h,page]);
+    setPage(name);
+    if(name==="notifs") setNC(0);
+  };
+ 
+  const refreshProfile=async()=>{
+    try{const p=await api("/api/profile");setProfile(p);}catch(e){}
+  };
+ 
+  // Auto-refresh profile every 2 min
+  useEffect(()=>{
+    if(!user)return;
+    const iv=setInterval(()=>{
+      api("/api/profile").then(setProfile).catch(()=>{});
+      api("/api/notifications").then(d=>setNC(d.unread||0)).catch(()=>{});
+    },120000);
+    return()=>clearInterval(iv);
+  },[user]);
+ 
+  if(!user) return<><Toast t={t}/><AuthPage onLogin={login}/></>;
+ 
+  const isAdmin=user.role==="admin"||user.role==="teacher";
+ 
+  const navItems=[
+    {id:"home",i:"🏠",l:"الرئيسية"},
+    {id:"lectures",i:"📚",l:"المحاضرات"},
+    {id:"exams",i:"📝",l:"الامتحانات"},
+    {id:"leaderboard",i:"🏆",l:"الأوائل"},
+    isAdmin?{id:"admin",i:"⚙️",l:"الإدارة"}:{id:"profile",i:"👤",l:"ملفي"},
+  ];
+ 
+  const pages={
+    home:<HomePage profile={profile} goPage={goPage}/>,
+    lectures:<LecturesPage toast={showToast}/>,
+    exams:<ExamsPage toast={showToast}/>,
+    leaderboard:<LeaderboardPage toast={showToast}/>,
+    profile:<ProfilePage profile={profile} toast={showToast} onRefresh={refreshProfile} onLogout={logout}/>,
+    notifs:<NotifsPage toast={showToast}/>,
+    admin:<AdminPage toast={showToast}/>,
+  };
+ 
+  return(
+    <div id="root" style={{height:"100vh",display:"flex",flexDirection:"column"}}>
+      <Toast t={t}/>
+      <div className="pages">
+        <div style={{position:"absolute",inset:0,overflowY:"auto",padding:"16px 16px 76px"}}>
+          {pages[page]||pages.home}
+        </div>
+      </div>
+      <nav className="nav">
+        {navItems.map(({id,i,l})=>(
+          <div key={id} className={`nav-item ${page===id?"active":""}`}
+               onClick={()=>goPage(id,false)} style={{position:"relative"}}>
+            <span className="nav-icon">{i}</span>
+            <span className="nav-label">{l}</span>
+            {id==="notifs"&&notifCount>0&&<div className="nb"/>}
+          </div>
+        ))}
+        <div className={`nav-item ${page==="notifs"?"active":""}`}
+             onClick={()=>goPage("notifs",false)} style={{position:"relative"}}>
+          <span className="nav-icon">🔔</span>
+          <span className="nav-label">إشعارات</span>
+          {notifCount>0&&<div className="nb"/>}
+        </div>
       </nav>
     </div>
   );
 }
-
+ 
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+<script>
+// PWA Service Worker
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("/sw.js").catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
+ 

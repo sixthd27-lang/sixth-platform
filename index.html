@@ -288,10 +288,10 @@ const SUBJECTS = {
   arabic:   {n:"اللغة العربية",   i:"📖",c:"rgba(52,152,219,.18)"},
   islamic:  {n:"التربية الإسلامية",i:"🕌",c:"rgba(46,204,113,.15)"},
   english:  {n:"اللغة الإنكليزية",i:"🌍",c:"rgba(99,110,114,.18)"},
-  math:     {n:"الرياضيات",       i:"📐",c:"rgba(124,58,237,.18)"},
-  biology:  {n:"الأحياء",         i:"🧬",c:"rgba(26,188,156,.15)"},
-  chemistry:{n:"الكيمياء",        i:"⚗️",c:"rgba(245,158,11,.12)"},
-  physics:  {n:"الفيزياء",        i:"⚡",c:"rgba(239,68,68,.12)"},
+  math:     {n:"الرياضيات",        i:"📐",c:"rgba(124,58,237,.18)"},
+  biology:  {n:"الأحياء",          i:"🧬",c:"rgba(26,188,156,.15)"},
+  chemistry:{n:"الكيمياء",         i:"⚗️",c:"rgba(245,158,11,.12)"},
+  physics:  {n:"الفيزياء",         i:"⚡",c:"rgba(239,68,68,.12)"},
 };
 const THRESH=[0,100,300,700,1500,3000,5000,8000,12000,18000,25000];
 
@@ -346,7 +346,7 @@ function Toast({t}){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  Spinner / Skeleton — (تم تصحيح السهم المفقود هنا)
+//  Spinner / Skeleton
 // ══════════════════════════════════════════════════════════════
 const Sp=()=><div className="spin"/>;
 const Skel=()=> (
@@ -364,7 +364,7 @@ function AuthPage({onLogin}){
   const[mode,setMode]=useState("login");
   const[form,setForm]=useState({full_name:"",username:"",password:"",school_name:"",class_code:""});
   const[loading,setLoading]=useState(false);
-  const[err,setErr]=useState("");
+  const[err,setErr]=("");
   const set=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
 
   useEffect(()=>{
@@ -597,7 +597,7 @@ function LecturesPage({toast}){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  Exams
+//  Exam Card
 // ══════════════════════════════════════════════════════════════
 function ExamCard({exam,toast,onRefresh}){
   const[status,setStatus]=useState(exam.my_status||"not_started");
@@ -703,52 +703,66 @@ function ExamCard({exam,toast,onRefresh}){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  Exams List
+//  Exams List Page
 // ══════════════════════════════════════════════════════════════
 function ExamsPage({toast}){
   const[exams,setExams]=useState(null);
-  const load=()=>api("/api/exams").then(d=>setExams(d.exams||[])).catch(e=>toast(e.message,"e"));
-  useEffect(()=>{load();},[]);
-  if(!exams)return<Skel/>;
+  const[loading,setLoading]=useState(true);
+
+  const load=()=> {
+    setLoading(true);
+    api("/api/exams").then(d=>{setExams(d.exams||[]);setLoading(false);})
+    .catch(e=>{toast(e.message,"e");setLoading(false);});
+  };
+
+  useEffect(()=>{ load(); },[]);
+
+  if(loading)return<Skel/>;
+
   return(
     <div className="au">
       <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
-        📝 <span className="neon-title">الامتحانات المتاحة</span>
+        📝 <span className="neon-title">الامتحانات</span>
       </div>
-      {!exams.length?<div className="empty"><div className="empty-icon">📝</div>لا توجد امتحانات حالياً</div>
+      {!exams||!exams.length?<div className="empty"><div className="empty-icon">📂</div>لا توجد امتحانات متاحة حالياً</div>
       :exams.map(ex=><ExamCard key={ex.id} exam={ex} toast={toast} onRefresh={load}/>)}
     </div>
   );
 }
 
 // ══════════════════════════════════════════════════════════════
-//  Leaderboard
+//  Leaderboard Page
 // ══════════════════════════════════════════════════════════════
 function LeaderboardPage({toast}){
-  const[list,setList]=useState(null);
+  const[users,setUsers]=useState(null);
+  const[loading,setLoading]=useState(true);
+
   useEffect(()=>{
-    api("/api/leaderboard").then(d=>setList(d.leaderboard||[])).catch(e=>toast(e.message,"e"));
+    api("/api/leaderboard").then(d=>{setUsers(d.users||[]);setLoading(false);})
+    .catch(e=>{toast(e.message,"e");setLoading(false);});
   },[]);
-  if(!list)return<Skel/>;
+
+  if(loading)return<Skel/>;
+
   return(
     <div className="au">
       <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
-        🏆 <span className="neon-title">لوحة أوائل العراق</span>
+        🏆 <span className="neon-title">لوحة الأوائل</span>
       </div>
-      {!list.length?<div className="empty">لا يوجد متصدرين بعد</div>
-      :list.map((u,idx)=>{
-        const rank=idx+1;
-        const cls=rank===1?"gold":rank===2?"silver":rank===3?"bronze":"";
-        const crown=rank===1?"👑":rank===2?"🥈":rank===3?"🥉":"👤";
+      {!users||!users.length?<div className="empty">لا يوجد بيانات تصنيف حالياً</div>
+      :users.map((u,idx)=>{
+        const r=idx+1;
+        const cls=r===1?"gold":r===2?"silver":r===3?"bronze":"";
+        const av=r===1?"🥇":r===2?"🥈":r===3?"🥉":"👤";
         return(
           <div key={u.user_id||idx} className={`lb ${cls}`}>
-            <div className="lb-rank">{rank}</div>
-            <div className="lb-av" style={{background:rank<=3?"rgba(251,191,36,.1)":"var(--s2)"}}>{crown}</div>
+            <div className="lb-rank">{r}</div>
+            <div className="lb-av" style={{background:"var(--s2)"}}>{av}</div>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontSize:13,fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{u.full_name}</div>
-              <div style={{fontSize:10,color:"var(--t2)"}}>{u.school_name||"طالب خارجي"} • المستوى {xpInfo(u.xp||0).level}</div>
+              <div style={{fontSize:10,color:"var(--t2)"}}>{u.school_name||"طالب المنصة"} • مستوى {u.level||1}</div>
             </div>
-            <div className="lb-xp">{(u.xp||0).toLocaleString("ar")} XP</div>
+            <div className="lb-xp">{u.xp?.toLocaleString("ar")||0} XP</div>
           </div>
         );
       })}
@@ -757,24 +771,29 @@ function LeaderboardPage({toast}){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  Profile
+//  Profile Page
 // ══════════════════════════════════════════════════════════════
 function ProfilePage({profile,onLogout}){
   if(!profile)return<Sp/>;
   return(
-    <div className="au text-center" style={{textAlign:"center"}}>
+    <div className="au">
       <div className="prof-hero">
-        <div className="prof-av">{profile.badge||"🥉"}</div>
+        <div className="prof-av">👤</div>
         <div style={{fontSize:18,fontWeight:900}} className="neon-title">{profile.full_name}</div>
         <div style={{fontSize:11,color:"var(--t2)",marginTop:4}}>@{profile.username}</div>
       </div>
-      <div className="card" style={{textAlign:"right"}}>
-        <div style={{fontSize:12,marginBottom:8}}><b>🏫 المدرسة:</b> {profile.school_name||"غير محدد"}</div>
-        <div style={{fontSize:12,marginBottom:8}}><b>⭐ مجموع الـ XP:</b> {profile.xp?.toLocaleString("ar")}</div>
-        <div style={{fontSize:12,marginBottom:8}}><b>🏅 المستوى الحالي:</b> {profile.level}</div>
-        <div style={{fontSize:12}}><b>🛠️ رتبة الحساب:</b> {profile.role==="admin"?"مدير المنصة ⚙️":"طالب 🎓"}</div>
+
+      <div className="card">
+        <div style={{fontSize:12,fontWeight:700,marginBottom:10}}>معلومات الحساب</div>
+        <div style={{display:"flex",flexDirection:"column",gap:8,fontSize:12}}>
+          <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"var(--t2)"}}>المدرسة:</span><span>{profile.school_name||"—"}</span></div>
+          <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"var(--t2)"}}>مجموع الـ XP:</span><span>{profile.xp?.toLocaleString("ar")}</span></div>
+          <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"var(--t2)"}}>رقم المستوى الحالي:</span><span>{profile.level}</span></div>
+          <div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"var(--t2)"}}>الصلاحية:</span><span>{profile.role==="admin"?"مسؤول (Admin)":"طالب"}</span></div>
+        </div>
       </div>
-      <button className="btn btn-danger" style={{marginTop:20}} onClick={onLogout}>
+
+      <button className="btn btn-danger" style={{marginTop:10}} onClick={onLogout}>
         🚪 تسجيل الخروج
       </button>
     </div>
@@ -782,95 +801,22 @@ function ProfilePage({profile,onLogout}){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  Admin Control Dashboard
+//  Admin Dashboard (شاشة الإدارة المبسطة)
 // ══════════════════════════════════════════════════════════════
 function AdminDashboard({toast}){
-  const[tab,setTab]=useState("menu");
-  const[lecForm,setLecForm]=useState({title:"",subject_key:"math",chapter:"",file_type:"video",url:"",teacher:""});
-  const[examForm,setExamForm]=useState({title:"",description:"",subject_key:"math",duration_minutes:30,url:""});
-  const[loading,setLoading]=useState(false);
-
-  const addLec=async()=>{
-    if(!lecForm.title||!lecForm.url){toast("يرجى ملء العناوين والروابط","e");return;}
-    setLoading(true);
-    try{
-      await api("/api/admin/lectures",{method:"POST",body:lecForm});
-      toast("✅ تم إضافة المحاضرة بنجاح","s");
-      setLecForm({title:"",subject_key:"math",chapter:"",file_type:"video",url:"",teacher:""});
-    }catch(e){toast(e.message,"e");}
-    setLoading(false);
-  };
-
-  const addExam=async()=>{
-    if(!examForm.title){toast("يرجى كتابة عنوان الامتحان","e");return;}
-    setLoading(true);
-    try{
-      await api("/api/admin/exams",{method:"POST",body:examForm});
-      toast("✅ تم نشر الامتحان بنجاح","s");
-      setExamForm({title:"",description:"",subject_key:"math",duration_minutes:30,url:""});
-    }catch(e){toast(e.message,"e");}
-    setLoading(false);
-  };
-
-  if(tab==="lecture") return(
-    <div className="as">
-      <div className="back" onClick={()=>setTab("menu")}>◀️ إدارة المنصة</div>
-      <div className="sec">إضافة محاضرة جديدة</div>
-      <div className="card">
-        <div className="form-group"><label className="form-label">العنوان</label><input className="input" value={lecForm.title} onChange={e=>setLecForm({...lecForm,title:e.target.value})}/></div>
-        <div className="form-group">
-          <label className="form-label">المادة</label>
-          <select className="input" value={lecForm.subject_key} onChange={e=>setLecForm({...lecForm,subject_key:e.target.value})}>
-            {Object.entries(SUBJECTS).map(([k,v])=><option key={k} value={k}>{v.n}</option>)}
-          </select>
-        </div>
-        <div className="form-group"><label className="form-label">الفصل / الجزء</label><input className="input" placeholder="مثال: الفصل الأول" value={lecForm.chapter} onChange={e=>setLecForm({...lecForm,chapter:e.target.value})}/></div>
-        <div className="form-group">
-          <label className="form-label">نوع الملف</label>
-          <select className="input" value={lecForm.file_type} onChange={e=>setLecForm({...lecForm,file_type:e.target.value})}>
-            <option value="video">🎬 فيديو (يوتيوب)</option>
-            <option value="pdf">📄 ملزمة / ملف PDF</option>
-            <option value="link">🔗 رابط خارجي</option>
-          </select>
-        </div>
-        <div className="form-group"><label className="form-label">رابط المحاضرة (URL)</label><input className="input" placeholder="https://..." value={lecForm.url} onChange={e=>setLecForm({...lecForm,url:e.target.value})}/></div>
-        <div className="form-group"><label className="form-label">اسم الأستاذ</label><input className="input" value={lecForm.teacher} onChange={e=>setLecForm({...lecForm,teacher:e.target.value})}/></div>
-        <button className="btn btn-p" onClick={addLec} disabled={loading}>{loading?<Sp/>:"➕ نشر المحاضرة الآن"}</button>
-      </div>
-    </div>
-  );
-
-  if(tab==="exam") return(
-    <div className="as">
-      <div className="back" onClick={()=>setTab("menu")}>◀️ إدارة المنصة</div>
-      <div className="sec">إنشاء امتحان جديد مؤقت</div>
-      <div className="card">
-        <div className="form-group"><label className="form-label">عنوان الامتحان</label><input className="input" value={examForm.title} onChange={e=>setExamForm({...examForm,title:e.target.value})}/></div>
-        <div className="form-group"><label className="form-label">وصف / تعليمات</label><input className="input" value={examForm.description} onChange={e=>setExamForm({...examForm,description:e.target.value})}/></div>
-        <div className="form-group">
-          <label className="form-label">المادة المختبرة</label>
-          <select className="input" value={examForm.subject_key} onChange={e=>setExamForm({...examForm,subject_key:e.target.value})}>
-            {Object.entries(SUBJECTS).map(([k,v])=><option key={k} value={k}>{v.n}</option>)}
-          </select>
-        </div>
-        <div className="form-group"><label className="form-label">الوقت المتاح (بالدقائق)</label><input className="input" type="number" value={examForm.duration_minutes} onChange={e=>setExamForm({...examForm,duration_minutes:parseInt(e.target.value)||30})}/></div>
-        <div className="form-group"><label className="form-label">رابط الأسئلة (غوغل فورم أو ملف)</label><input className="input" placeholder="https://..." value={examForm.url} onChange={e=>setExamForm({...examForm,url:e.target.value})}/></div>
-        <button className="btn btn-p" onClick={addExam} disabled={loading}>{loading?<Sp/>:"🚀 إطلاق الامتحان فوراً"}</button>
-      </div>
-    </div>
-  );
-
   return(
     <div className="au">
-      <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>⚙️ لوحة تحكم <span className="neon-title">المدير</span></div>
+      <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
+        ⚙️ <span className="neon-title">لوحة الإدارة</span>
+      </div>
       <div className="admin-grid">
-        <div className="admin-card" onClick={()=>setTab("lecture")}>
-          <div className="admin-icon">📚</div>
+        <div className="admin-card" onClick={()=>toast("ميزة إضافة محاضرة ستتوفر قريباً","i")}>
+          <div className="admin-icon">➕📚</div>
           <div className="admin-label">إضافة محاضرة</div>
         </div>
-        <div className="admin-card" onClick={()=>setTab("exam")}>
-          <div className="admin-icon">📝</div>
-          <div className="admin-label">إنشاء امتحان</div>
+        <div className="admin-card" onClick={()=>toast("ميزة إضافة امتحان ستتوفر قريباً","i")}>
+          <div className="admin-icon">➕📝</div>
+          <div className="admin-label">إضافة امتحان</div>
         </div>
       </div>
     </div>
@@ -878,35 +824,41 @@ function AdminDashboard({toast}){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  Main App Component
+//  Main Application Handler
 // ══════════════════════════════════════════════════════════════
 function App(){
   const[user,setUser]=useState(null);
-  const[page,setPage]=useState("home");
   const[profile,setProfile]=useState(null);
-  const[toast,showToast]=useToast();
+  const[page,setPage]=useState("home");
+  const[toastData,showToast]=useToast();
 
-  const loadProfile=()=>{
+  const fetchProfile=useCallback(()=>{
     if(!_tok)return;
-    api("/auth/me").then(d=>{
-      let badge="🥉"; const xp=d.xp||0;
-      if(xp>=1500) badge="🥈"; if(xp>=5000) badge="🥇";
-      if(xp>=12000) badge="💎"; if(xp>=25000) badge="👑";
-      setProfile({...d,badge,level:xpInfo(xp).level});
-    }).catch(()=>{});
-  };
+    api("/auth/me").then(d=>setProfile(d)).catch(()=>{});
+  },[]);
 
-  useEffect(()=>{ if(user) loadProfile(); },[user,page]);
+  useEffect(()=>{
+    if(user) {
+      fetchProfile();
+      const intv=setInterval(fetchProfile,30000); // تحديث دوري لملف التعريف
+      return()=>clearInterval(intv);
+    }
+  },[user,fetchProfile]);
 
   const logout=()=>{
-    localStorage.removeItem("_t");localStorage.removeItem("_u");
-    _tok=""; setUser(null); setProfile(null); setPage("home");
+    localStorage.removeItem("_t");
+    localStorage.removeItem("_u");
+    _tok="";
+    setUser(null);
+    setProfile(null);
+    setPage("home");
   };
 
-  if(!user) return <><AuthPage onLogin={(u)=>setUser(u)}/><Toast t={toast}/></>;
+  if(!user) return <AuthPage onLogin={(u)=>setUser(u)}/>;
 
   return(
-    <div id="root">
+    <>
+      <Toast t={toastData}/>
       <div className="pages">
         <div className={`page ${page==="home"?"active":""}`}><HomePage profile={profile} goPage={setPage}/></div>
         <div className={`page ${page==="lectures"?"active":""}`}>{page==="lectures"&&<LecturesPage toast={showToast}/>}</div>
@@ -931,8 +883,7 @@ function App(){
           </div>
         ))}
       </nav>
-      <Toast t={toast}/>
-    </div>
+    </>
   );
 }
 

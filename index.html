@@ -367,7 +367,6 @@ function AuthPage({onLogin}){
   const[err,setErr]=useState("");
   const set=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
 
-  // تحقق من التوكن المحفوظ
   useEffect(()=>{
     const t=localStorage.getItem("_t");
     if(!t)return;
@@ -598,7 +597,7 @@ function LecturesPage({toast}){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  Exam Card with live timer
+//  Exams
 // ══════════════════════════════════════════════════════════════
 function ExamCard({exam,toast,onRefresh}){
   const[status,setStatus]=useState(exam.my_status||"not_started");
@@ -637,6 +636,7 @@ function ExamCard({exam,toast,onRefresh}){
       await api("/api/exams/submit",{method:"POST",body:{exam_id:exam.id,answer_text:"تم التسليم"}});
       setStatus("submitted");clearInterval(ti.current);
       toast("✅ تم التسليم! +30 XP 🎉","s");
+      if(onRefresh) onRefresh();
     }catch(e){toast(e.message,"e");}
     setLoading(false);
   };
@@ -676,7 +676,7 @@ function ExamCard({exam,toast,onRefresh}){
       )}
       {status==="submitted"&&exam.my_score!=null&&(
         <div style={{background:"rgba(16,185,129,.1)",border:"1px solid rgba(16,185,129,.2)",
-             borderRadius:8,padding:"8px 12px",fontSize:12,fontWeight:700,color:"var(--green)"}}>
+             borderRadius:8,padding:"8px 12px",fontSize:12,fontWeight:700,color:"var(--green)",marginBottom:10}}>
           📊 درجتك: {exam.my_score?.toFixed(1)}/100
         </div>
       )}
@@ -710,10 +710,10 @@ function ExamsPage({toast}){
   return(
     <div className="au">
       <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
-        📝 <span className="neon-title">الامتحانات</span>
+        📝 <span className="neon-title">الامتحانات المتاحة</span>
       </div>
-      {!exams.length?<div className="empty"><div className="empty-icon">📭</div>لا توجد امتحانات نشطة</div>
-      :exams.map(e=><ExamCard key={e.id} exam={e} toast={toast} onRefresh={load}/>)}
+      {!exams.length?<div className="empty"><div className="empty-icon">📝</div>لا توجد امتحانات حالياً</div>
+      :exams.map(ex=><ExamCard key={ex.id} exam={ex} toast={toast} onRefresh={load}/>)}
     </div>
   );
 }
@@ -722,32 +722,33 @@ function ExamsPage({toast}){
 //  Leaderboard
 // ══════════════════════════════════════════════════════════════
 function LeaderboardPage({toast}){
-  const[rows,setRows]=useState(null);
-  useEffect(()=>{api("/api/leaderboard?limit=20").then(d=>setRows(d.leaderboard||[])).catch(e=>toast(e.message,"e"));},[]);
-  if(!rows)return<Skel/>;
-  const bgs={
-    0:"linear-gradient(135deg,#fbbf24,#f59e0b)",
-    1:"linear-gradient(135deg,#9ca3af,#6b7280)",
-    2:"linear-gradient(135deg,#cd7f32,#a0522d)",
-  };
-  const medals=["🥇","🥈","🥉"];
+  const[list,setList]=useState(null);
+  useEffect(()=>{
+    api("/api/leaderboard").then(d=>setList(d.leaderboard||[])).catch(e=>toast(e.message,"e"));
+  },[]);
+  if(!list)return<Skel/>;
   return(
     <div className="au">
       <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
-        🏆 <span className="neon-title">لوحة الأوائل</span>
+        🏆 <span className="neon-title">لوحة أوائل العراق</span>
       </div>
-      {!rows.length?<div className="empty"><div className="empty-icon">📊</div>لا توجد بيانات</div>
-      :rows.map((r,i)=>(
-        <div key={r.user_id} className={`lb ${i===0?"gold":i===1?"silver":i===2?"bronze":""}`}>
-          <div className="lb-rank">{medals[i]||`${i+1}.`}</div>
-          <div className="lb-av" style={{background:bgs[i]||"var(--card2)"}}>{r.badge||"🥉"}</div>
-          <div style={{flex:1}}>
-            <div style={{fontSize:13,fontWeight:700}}>{r.full_name||"—"}</div>
-            <div style={{fontSize:10,color:"var(--t2)"}}>LVL {r.level||1}{r.school_name?` • ${r.school_name}`:""}</div>
+      {!list.length?<div className="empty">لا يوجد متصدرين بعد</div>
+      :list.map((u,idx)=>{
+        const rank=idx+1;
+        const cls=rank===1?"gold":rank===2?"silver":rank===3?"bronze":"";
+        const crown=rank===1?"👑":rank===2?"🥈":rank===3?"🥉":"👤";
+        return(
+          <div key={u.user_id||idx} className={`lb ${cls}`}>
+            <div className="lb-rank">{rank}</div>
+            <div className="lb-av" style={{background:rank<=3?"rgba(251,191,36,.1)":"var(--s2)"}}>{crown}</div>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{fontSize:13,fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{u.full_name}</div>
+              <div style={{fontSize:10,color:"var(--t2)"}}>{u.school_name||"طالب خارجي"} • المستوى {xpInfo(u.xp||0).level}</div>
+            </div>
+            <div className="lb-xp">{(u.xp||0).toLocaleString("ar")} XP</div>
           </div>
-          <div className="lb-xp">{(r.xp||0).toLocaleString("ar")}</div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -755,393 +756,185 @@ function LeaderboardPage({toast}){
 // ══════════════════════════════════════════════════════════════
 //  Profile
 // ══════════════════════════════════════════════════════════════
-function ProfilePage({profile,toast,onRefresh,onLogout}){
-  if(!profile)return<Skel/>;
-  const{xp=0,level=1,badge="🥉",full_name,rank_pos,school_name,done_lec=0,done_exam=0,progress={}}=profile;
-  const pr=progress.pct!=null?progress:xpInfo(xp);
-  const bgs={"👑":"linear-gradient(135deg,#fbbf24,#ef4444)","💎":"linear-gradient(135deg,#06b6d4,#2563eb)","🥇":"linear-gradient(135deg,#fbbf24,#f59e0b)","🥈":"linear-gradient(135deg,#9ca3af,#6b7280)","🥉":"linear-gradient(135deg,#cd7f32,#a0522d)"};
+function ProfilePage({profile,onLogout}){
+  if(!profile)return<Sp/>;
   return(
-    <div className="au">
+    <div className="au text-center" style={{textAlign:"center"}}>
       <div className="prof-hero">
-        <div className="prof-av" style={{background:bgs[badge]||"linear-gradient(135deg,var(--p),var(--blue))"}}>
-          {badge}
-        </div>
-        <div style={{fontSize:18,fontWeight:900}}>{full_name||"—"}</div>
-        <div style={{fontSize:11,color:"var(--t2)",marginTop:4}}>
-          {rank_pos?`🏆 الترتيب: #${rank_pos}`:`المستوى ${level}`}
-        </div>
+        <div className="prof-av">{profile.badge||"🥉"}</div>
+        <div style={{fontSize:18,fontWeight:900}} className="neon-title">{profile.full_name}</div>
+        <div style={{fontSize:11,color:"var(--t2)",marginTop:4}}>@{profile.username}</div>
       </div>
-      <div className="stats3">
-        <div className="stat"><div className="stat-v">{fmtN(xp)}</div><div className="stat-k">⭐ XP</div></div>
-        <div className="stat"><div className="stat-v">{level}</div><div className="stat-k">🏅 المستوى</div></div>
-        <div className="stat"><div className="stat-v">{done_lec}</div><div className="stat-k">📚 محاضرة</div></div>
+      <div className="card" style={{textAlign:"right"}}>
+        <div style={{fontSize:12,marginBottom:8}}><b>🏫 المدرسة:</b> {profile.school_name||"غير محدد"}</div>
+        <div style={{fontSize:12,marginBottom:8}}><b>⭐ مجموع الـ XP:</b> {profile.xp?.toLocaleString("ar")}</div>
+        <div style={{fontSize:12,marginBottom:8}}><b>🏅 المستوى الحالي:</b> {profile.level}</div>
+        <div style={{fontSize:12}}><b>🛠️ رتبة الحساب:</b> {profile.role==="admin"?"مدير المنصة ⚙️":"طالب 🎓"}</div>
       </div>
-      <div className="card">
-        <div style={{fontSize:12,fontWeight:700,marginBottom:8}}>📈 التقدم للمستوى التالي</div>
-        <div className="prog" style={{height:10}}>
-          <div className="prog-fill" style={{width:`${pr.pct}%`}}/>
-        </div>
-        <div style={{display:"flex",justifyContent:"space-between",marginTop:5,fontSize:10,color:"var(--t2)"}}>
-          <span>{xp.toLocaleString("ar")} XP</span>
-          <span>{pr.pct}%</span>
-          <span>{(pr.next||0).toLocaleString("ar")} XP</span>
-        </div>
-      </div>
-      <div className="sec">معلومات</div>
-      <div className="card">
-        {[["🏫","المدرسة",school_name||"—"],["📝","الامتحانات المقدمة",done_exam],["🏅","المستوى الحالي",`${badge} LVL ${level}`]].map(([i,k,v])=>(
-          <div key={k} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderBottom:"1px solid var(--b1)"}}>
-            <span style={{fontSize:19,width:28}}>{i}</span>
-            <div>
-              <div style={{fontSize:10,color:"var(--t2)"}}>{k}</div>
-              <div style={{fontSize:13,fontWeight:700}}>{v}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="nline"/>
-      <button className="btn btn-danger" onClick={onLogout}>🚪 تسجيل الخروج</button>
+      <button className="btn btn-danger" style={{marginTop:20}} onClick={onLogout}>
+        🚪 تسجيل الخروج
+      </button>
     </div>
   );
 }
 
 // ══════════════════════════════════════════════════════════════
-//  Notifications
+//  Admin Control Dashboard
 // ══════════════════════════════════════════════════════════════
-function NotifsPage({toast}){
-  const[notifs,setNotifs]=useState(null);
-  useEffect(()=>{
-    api("/api/notifications").then(d=>{
-      setNotifs(d.notifications||[]);
-      api("/api/notifications/read",{method:"POST"}).catch(()=>{});
-    }).catch(e=>toast(e.message,"e"));
-  },[]);
-  const icons={success:"✅",info:"ℹ️",exam:"📝",lecture:"📚",warning:"⚠️"};
-  if(!notifs)return<Skel/>;
-  return(
-    <div className="au">
-      <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
-        🔔 <span className="neon-title">الإشعارات</span>
-      </div>
-      {!notifs.length?<div className="empty"><div className="empty-icon">🔕</div>لا توجد إشعارات</div>
-      :notifs.map(n=>(
-        <div key={n.id} className="ci" style={{cursor:"default",opacity:n.is_read?.8:1}}>
-          <div className="ci-ico" style={{background:"var(--s2)",fontSize:22}}>{icons[n.type]||"🔔"}</div>
-          <div className="ci-body">
-            <div className="ci-title">{n.title}</div>
-            <div className="ci-sub">{n.message}</div>
-            <div style={{fontSize:9,color:"var(--t3)",marginTop:3}}>
-              {new Date(n.created_at).toLocaleDateString("ar-IQ")}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ══════════════════════════════════════════════════════════════
-//  Admin Panel
-// ══════════════════════════════════════════════════════════════
-function AdminPage({toast}){
-  const[view,setView]=useState("main");
-  const[stats,setStats]=useState(null);
-  const[users,setUsers]=useState(null);
-  const[subs,setSubs]=useState(null);
-  const[form,setForm]=useState({});
+function AdminDashboard({toast}){
+  const[tab,setTab]=useState("menu");
+  const[lecForm,setLecForm]=useState({title:"",subject_key:"math",chapter:"",file_type:"video",url:"",teacher:""});
+  const[examForm,setExamForm]=useState({title:"",description:"",subject_key:"math",duration_minutes:30,url:""});
   const[loading,setLoading]=useState(false);
-  const set=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
-
-  useEffect(()=>{api("/api/admin/stats").then(setStats).catch(()=>{});},[]);
 
   const addLec=async()=>{
-    if(!form.lec_title||!form.lec_subj){toast("أدخل العنوان والمادة","e");return;}
+    if(!lecForm.title||!lecForm.url){toast("يرجى ملء العناوين والروابط","e");return;}
     setLoading(true);
     try{
-      await api("/api/lectures",{method:"POST",body:{title:form.lec_title,subject_key:form.lec_subj,
-        chapter:form.lec_chapter||"",description:form.lec_desc||"",url:form.lec_url||"",file_type:form.lec_type||"link"}});
-      toast("✅ تمت إضافة المحاضرة وإشعار الطلاب!","s");
-      setForm({});setView("main");
+      await api("/api/admin/lectures",{method:"POST",body:lecForm});
+      toast("✅ تم إضافة المحاضرة بنجاح","s");
+      setLecForm({title:"",subject_key:"math",chapter:"",file_type:"video",url:"",teacher:""});
     }catch(e){toast(e.message,"e");}
     setLoading(false);
   };
 
   const addExam=async()=>{
-    if(!form.ex_title||!form.ex_subj){toast("أدخل العنوان والمادة","e");return;}
+    if(!examForm.title){toast("يرجى كتابة عنوان الامتحان","e");return;}
     setLoading(true);
     try{
-      await api("/api/exams",{method:"POST",body:{title:form.ex_title,subject_key:form.ex_subj,
-        duration_minutes:parseInt(form.ex_dur)||60,description:form.ex_desc||"",url:form.ex_url||""}});
-      toast("✅ تم إنشاء الامتحان وإشعار الطلاب!","s");
-      setForm({});setView("main");
+      await api("/api/admin/exams",{method:"POST",body:examForm});
+      toast("✅ تم نشر الامتحان بنجاح","s");
+      setExamForm({title:"",description:"",subject_key:"math",duration_minutes:30,url:""});
     }catch(e){toast(e.message,"e");}
     setLoading(false);
   };
 
-  const loadUsers=()=>{
-    api("/api/admin/users").then(d=>setUsers(d.users||[])).catch(e=>toast(e.message,"e"));
-    setView("users");
-  };
-
-  const broadcast=async()=>{
-    if(!form.bc_msg){toast("اكتب الرسالة","e");return;}
-    setLoading(true);
-    try{
-      const d=await api("/api/admin/broadcast",{method:"POST",body:{title:form.bc_title||"إشعار",message:form.bc_msg}});
-      toast(`✅ أُرسل إلى ${d.sent} طالب`,"s");setForm({});setView("main");
-    }catch(e){toast(e.message,"e");}
-    setLoading(false);
-  };
-
-  const updRanks=async()=>{
-    await api("/api/admin/ranks",{method:"POST"}).catch(()=>{});
-    toast("✅ تم تحديث الترتيب","s");
-    api("/api/admin/stats").then(setStats).catch(()=>{});
-  };
-
-  const SUBJECTS_OPTS=Object.entries(SUBJECTS).map(([k,v])=>(
-    <option key={k} value={k}>{v.i} {v.n}</option>
-  ));
-
-  if(view==="add_lec") return(
+  if(tab==="lecture") return(
     <div className="as">
-      <div className="back" onClick={()=>setView("main")}><span style={{fontSize:19}}>◀️</span><span style={{fontSize:12,color:"var(--t2)",fontWeight:700}}>رجوع</span></div>
-      <div style={{fontSize:17,fontWeight:900,marginBottom:14}}>📚 إضافة محاضرة</div>
+      <div className="back" onClick={()=>setTab("menu")}>◀️ إدارة المنصة</div>
+      <div className="sec">إضافة محاضرة جديدة</div>
       <div className="card">
-        {[["lec_title","عنوان المحاضرة","نص"],["lec_url","رابط الملف أو الفيديو","نص"],["lec_chapter","اسم الفصل (اختياري)","نص"],["lec_desc","وصف (اختياري)","نص"]].map(([k,label,_])=>(
-          <div key={k} className="form-group">
-            <label className="form-label">{label}</label>
-            <input className="input" value={form[k]||""} onChange={set(k)} placeholder={label}/>
-          </div>
-        ))}
+        <div className="form-group"><label className="form-label">العنوان</label><input className="input" value={lecForm.title} onChange={e=>setLecForm({...lecForm,title:e.target.value})}/></div>
         <div className="form-group">
           <label className="form-label">المادة</label>
-          <select className="input" value={form.lec_subj||""} onChange={set("lec_subj")}>
-            <option value="">اختر المادة</option>{SUBJECTS_OPTS}
+          <select className="input" value={lecForm.subject_key} onChange={e=>setLecForm({...lecForm,subject_key:e.target.value})}>
+            {Object.entries(SUBJECTS).map(([k,v])=><option key={k} value={k}>{v.n}</option>)}
           </select>
         </div>
+        <div className="form-group"><label className="form-label">الفصل / الجزء</label><input className="input" placeholder="مثال: الفصل الأول" value={lecForm.chapter} onChange={e=>setLecForm({...lecForm,chapter:e.target.value})}/></div>
         <div className="form-group">
           <label className="form-label">نوع الملف</label>
-          <select className="input" value={form.lec_type||"link"} onChange={set("lec_type")}>
-            <option value="link">🔗 رابط</option>
-            <option value="pdf">📄 PDF</option>
-            <option value="video">🎬 فيديو</option>
-            <option value="image">🖼️ صورة</option>
+          <select className="input" value={lecForm.file_type} onChange={e=>setLecForm({...lecForm,file_type:e.target.value})}>
+            <option value="video">🎬 فيديو (يوتيوب)</option>
+            <option value="pdf">📄 ملزمة / ملف PDF</option>
+            <option value="link">🔗 رابط خارجي</option>
           </select>
         </div>
-        <button className="btn btn-p" onClick={addLec} disabled={loading}>{loading?<Sp/>:"✅ إضافة المحاضرة"}</button>
+        <div className="form-group"><label className="form-label">رابط المحاضرة (URL)</label><input className="input" placeholder="https://..." value={lecForm.url} onChange={e=>setLecForm({...lecForm,url:e.target.value})}/></div>
+        <div className="form-group"><label className="form-label">اسم الأستاذ</label><input className="input" value={lecForm.teacher} onChange={e=>setLecForm({...lecForm,teacher:e.target.value})}/></div>
+        <button className="btn btn-p" onClick={addLec} disabled={loading}>{loading?<Sp/>:"➕ نشر المحاضرة الآن"}</button>
       </div>
     </div>
   );
 
-  if(view==="add_exam") return(
+  if(tab==="exam") return(
     <div className="as">
-      <div className="back" onClick={()=>setView("main")}><span style={{fontSize:19}}>◀️</span><span style={{fontSize:12,color:"var(--t2)",fontWeight:700}}>رجوع</span></div>
-      <div style={{fontSize:17,fontWeight:900,marginBottom:14}}>📝 إضافة امتحان</div>
+      <div className="back" onClick={()=>setTab("menu")}>◀️ إدارة المنصة</div>
+      <div className="sec">إنشاء امتحان جديد مؤقت</div>
       <div className="card">
-        {[["ex_title","عنوان الامتحان"],["ex_url","رابط ورقة الامتحان (اختياري)"],["ex_desc","وصف (اختياري)"]].map(([k,label])=>(
-          <div key={k} className="form-group">
-            <label className="form-label">{label}</label>
-            <input className="input" value={form[k]||""} onChange={set(k)} placeholder={label}/>
-          </div>
-        ))}
+        <div className="form-group"><label className="form-label">عنوان الامتحان</label><input className="input" value={examForm.title} onChange={e=>setExamForm({...examForm,title:e.target.value})}/></div>
+        <div className="form-group"><label className="form-label">وصف / تعليمات</label><input className="input" value={examForm.description} onChange={e=>setExamForm({...examForm,description:e.target.value})}/></div>
         <div className="form-group">
-          <label className="form-label">المادة</label>
-          <select className="input" value={form.ex_subj||""} onChange={set("ex_subj")}>
-            <option value="">اختر المادة</option>{SUBJECTS_OPTS}
+          <label className="form-label">المادة المختبرة</label>
+          <select className="input" value={examForm.subject_key} onChange={e=>setExamForm({...examForm,subject_key:e.target.value})}>
+            {Object.entries(SUBJECTS).map(([k,v])=><option key={k} value={k}>{v.n}</option>)}
           </select>
         </div>
-        <div className="form-group">
-          <label className="form-label">مدة الامتحان (دقيقة)</label>
-          <input className="input" type="number" value={form.ex_dur||60} onChange={set("ex_dur")} min={5} max={300}/>
-        </div>
-        <button className="btn btn-p" onClick={addExam} disabled={loading}>{loading?<Sp/>:"✅ نشر الامتحان"}</button>
+        <div className="form-group"><label className="form-label">الوقت المتاح (بالدقائق)</label><input className="input" type="number" value={examForm.duration_minutes} onChange={e=>setExamForm({...examForm,duration_minutes:parseInt(e.target.value)||30})}/></div>
+        <div className="form-group"><label className="form-label">رابط الأسئلة (غوغل فورم أو ملف)</label><input className="input" placeholder="https://..." value={examForm.url} onChange={e=>setExamForm({...examForm,url:e.target.value})}/></div>
+        <button className="btn btn-p" onClick={addExam} disabled={loading}>{loading?<Sp/>:"🚀 إطلاق الامتحان فوراً"}</button>
       </div>
-    </div>
-  );
-
-  if(view==="broadcast") return(
-    <div className="as">
-      <div className="back" onClick={()=>setView("main")}><span style={{fontSize:19}}>◀️</span><span style={{fontSize:12,color:"var(--t2)",fontWeight:700}}>رجوع</span></div>
-      <div style={{fontSize:17,fontWeight:900,marginBottom:14}}>📢 بث جماعي</div>
-      <div className="card">
-        <div className="form-group"><label className="form-label">عنوان الإشعار</label>
-          <input className="input" value={form.bc_title||""} onChange={set("bc_title")} placeholder="مثال: إعلان مهم"/>
-        </div>
-        <div className="form-group"><label className="form-label">الرسالة</label>
-          <textarea className="input" value={form.bc_msg||""} onChange={set("bc_msg")} placeholder="اكتب رسالتك هنا…"/>
-        </div>
-        <button className="btn btn-p" onClick={broadcast} disabled={loading}>{loading?<Sp/>:"📢 إرسال للجميع"}</button>
-      </div>
-    </div>
-  );
-
-  if(view==="users") return(
-    <div className="as">
-      <div className="back" onClick={()=>setView("main")}><span style={{fontSize:19}}>◀️</span><span style={{fontSize:12,color:"var(--t2)",fontWeight:700}}>رجوع</span></div>
-      <div style={{fontSize:17,fontWeight:900,marginBottom:14}}>👥 الطلاب ({users?.length||0})</div>
-      {(users||[]).map(u=>(
-        <div key={u.id} className="ci" style={{cursor:"default"}}>
-          <div className="ci-ico" style={{background:"var(--s2)",fontSize:22}}>{u.badge||"🥉"}</div>
-          <div className="ci-body">
-            <div className="ci-title">{u.full_name}</div>
-            <div className="ci-sub">LVL {u.level||1} | {(u.xp||0).toLocaleString("ar")} XP | {u.school_name||"—"}</div>
-          </div>
-          <span style={{fontSize:10,color:"var(--t2)"}}>{u.username}</span>
-        </div>
-      ))}
     </div>
   );
 
   return(
     <div className="au">
-      <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>
-        ⚙️ <span className="neon-title">لوحة الإدارة</span>
-      </div>
-      {stats&&(
-        <div className="stats3" style={{gridTemplateColumns:"repeat(2,1fr)",gap:8,marginBottom:14}}>
-          {[["👥",stats.students,"طالب"],["📚",stats.lectures,"محاضرة"],["📝",stats.exams,"امتحان"],["✅",stats.submissions,"إجابة"]].map(([i,v,k])=>(
-            <div key={k} className="stat"><div className="stat-v">{v}</div><div className="stat-k">{i} {k}</div></div>
-          ))}
-        </div>
-      )}
+      <div style={{fontSize:19,fontWeight:900,marginBottom:14}}>⚙️ لوحة تحكم <span className="neon-title">المدير</span></div>
       <div className="admin-grid">
-        {[
-          {i:"📚",n:"إضافة محاضرة",a:()=>setView("add_lec")},
-          {i:"📝",n:"إضافة امتحان",a:()=>setView("add_exam")},
-          {i:"👥",n:"الطلاب",a:loadUsers},
-          {i:"📢",n:"بث جماعي",a:()=>setView("broadcast")},
-          {i:"🏆",n:"تحديث الترتيب",a:updRanks},
-        ].map(({i,n,a})=>(
-          <div key={n} className="admin-card" onClick={a}>
-            <div className="admin-icon">{i}</div>
-            <div className="admin-label">{n}</div>
-          </div>
-        ))}
+        <div className="admin-card" onClick={()=>setTab("lecture")}>
+          <div className="admin-icon">📚</div>
+          <div className="admin-label">إضافة محاضرة</div>
+        </div>
+        <div className="admin-card" onClick={()=>setTab("exam")}>
+          <div className="admin-icon">📝</div>
+          <div className="admin-label">إنشاء امتحان</div>
+        </div>
       </div>
-      {stats?.top?.length>0&&(
-        <>
-          <div className="sec">أوائل الطلاب</div>
-          {stats.top.map((s,i)=>(
-            <div key={i} className="ci" style={{cursor:"default"}}>
-              <div className="ci-ico" style={{fontSize:20}}>{["🥇","🥈","🥉","4.","5."][i]}</div>
-              <div className="ci-body">
-                <div className="ci-title">{s.full_name}</div>
-                <div className="ci-sub">LVL {s.level} | {(s.xp||0).toLocaleString("ar")} XP</div>
-              </div>
-              <span style={{fontSize:20}}>{s.badge}</span>
-            </div>
-          ))}
-        </>
-      )}
     </div>
   );
 }
 
 // ══════════════════════════════════════════════════════════════
-//  Main App
+//  Main App Component
 // ══════════════════════════════════════════════════════════════
 function App(){
   const[user,setUser]=useState(null);
-  const[profile,setProfile]=useState(null);
   const[page,setPage]=useState("home");
-  const[hist,setHist]=useState([]);
-  const[notifCount,setNC]=useState(0);
-  const[t,showToast]=useToast();
+  const[profile,setProfile]=useState(null);
+  const[toast,showToast]=useToast();
 
-  const login=async(data)=>{
-    setUser(data);
-    try{
-      const p=await api("/api/profile");
-      setProfile(p);
-      api("/api/notifications").then(d=>setNC(d.unread||0)).catch(()=>{});
-    }catch(e){}
+  const loadProfile=()=>{
+    if(!_tok)return;
+    api("/auth/me").then(d=>{
+      let badge="🥉"; const xp=d.xp||0;
+      if(xp>=1500) badge="🥈"; if(xp>=5000) badge="🥇";
+      if(xp>=12000) badge="💎"; if(xp>=25000) badge="👑";
+      setProfile({...d,badge,level:xpInfo(xp).level});
+    }).catch(()=>{});
   };
+
+  useEffect(()=>{ if(user) loadProfile(); },[user,page]);
 
   const logout=()=>{
     localStorage.removeItem("_t");localStorage.removeItem("_u");
-    _tok="";setUser(null);setProfile(null);setPage("home");
+    _tok=""; setUser(null); setProfile(null); setPage("home");
   };
 
-  const goPage=(name,push=true)=>{
-    if(push&&page!==name) setHist(h=>[...h,page]);
-    setPage(name);
-    if(name==="notifs") setNC(0);
-  };
-
-  const refreshProfile=async()=>{
-    try{const p=await api("/api/profile");setProfile(p);}catch(e){}
-  };
-
-  // Auto-refresh profile every 2 min
-  useEffect(()=>{
-    if(!user)return;
-    const iv=setInterval(()=>{
-      api("/api/profile").then(setProfile).catch(()=>{});
-      api("/api/notifications").then(d=>setNC(d.unread||0)).catch(()=>{});
-    },120000);
-    return()=>clearInterval(iv);
-  },[user]);
-
-  if(!user) return<><Toast t={t}/><AuthPage onLogin={login}/></>;
-
-  const isAdmin=user.role==="admin"||user.role==="teacher";
-
-  const navItems=[
-    {id:"home",i:"🏠",l:"الرئيسية"},
-    {id:"lectures",i:"📚",l:"المحاضرات"},
-    {id:"exams",i:"📝",l:"الامتحانات"},
-    {id:"leaderboard",i:"🏆",l:"الأوائل"},
-    isAdmin?{id:"admin",i:"⚙️",l:"الإدارة"}:{id:"profile",i:"👤",l:"ملفي"},
-  ];
-
-  const pages={
-    home:<HomePage profile={profile} goPage={goPage}/>,
-    lectures:<LecturesPage toast={showToast}/>,
-    exams:<ExamsPage toast={showToast}/>,
-    leaderboard:<LeaderboardPage toast={showToast}/>,
-    profile:<ProfilePage profile={profile} toast={showToast} onRefresh={refreshProfile} onLogout={logout}/>,
-    notifs:<NotifsPage toast={showToast}/>,
-    admin:<AdminPage toast={showToast}/>,
-  };
+  if(!user) return <><AuthPage onLogin={(u)=>setUser(u)}/><Toast t={toast}/></>;
 
   return(
-    <div id="root" style={{height:"100vh",display:"flex",flexDirection:"column"}}>
-      <Toast t={t}/>
+    <div id="root">
       <div className="pages">
-        <div style={{position:"absolute",inset:0,overflowY:"auto",padding:"16px 16px 76px"}}>
-          {pages[page]||pages.home}
-        </div>
+        <div className={`page ${page==="home"?"active":""}`}><HomePage profile={profile} goPage={setPage}/></div>
+        <div className={`page ${page==="lectures"?"active":""}`}>{page==="lectures"&&<LecturesPage toast={showToast}/>}</div>
+        <div className={`page ${page==="exams"?"active":""}`}>{page==="exams"&&<ExamsPage toast={showToast}/>}</div>
+        <div className={`page ${page==="leaderboard"?"active":""}`}>{page==="leaderboard"&&<LeaderboardPage toast={showToast}/>}</div>
+        <div className={`page ${page==="profile"?"active":""}`}><ProfilePage profile={profile} onLogout={logout}/></div>
+        <div className={`page ${page==="admin"?"active":""}`}>{page==="admin"&&<AdminDashboard toast={showToast}/>}</div>
       </div>
-      <nav className="nav">
-        {navItems.map(({id,i,l})=>(
-          <div key={id} className={`nav-item ${page===id?"active":""}`}
-               onClick={()=>goPage(id,false)} style={{position:"relative"}}>
-            <span className="nav-icon">{i}</span>
-            <span className="nav-label">{l}</span>
-            {id==="notifs"&&notifCount>0&&<div className="nb"/>}
+
+      <nav className="nav glass">
+        {[
+          {id:"home",i:"🏠",l:"الرئيسية"},
+          {id:"lectures",i:"📚",l:"المحاضرات"},
+          {id:"exams",i:"📝",l:"الامتحانات"},
+          {id:"leaderboard",i:"🏆",l:"الأوائل"},
+          ...(user.role==="admin"?[{id:"admin",i:"⚙️",l:"الإدارة"}]:[]),
+          {id:"profile",i:"👤",l:"ملفي"},
+        ].map(t=>(
+          <div key={t.id} className={`nav-item ${page===t.id?"active":""}`} onClick={()=>setPage(t.id)}>
+            <span className="nav-icon">{t.i}</span>
+            <span className="nav-label">{t.l}</span>
           </div>
         ))}
-        <div className={`nav-item ${page==="notifs"?"active":""}`}
-             onClick={()=>goPage("notifs",false)} style={{position:"relative"}}>
-          <span className="nav-icon">🔔</span>
-          <span className="nav-label">إشعارات</span>
-          {notifCount>0&&<div className="nb"/>}
-        </div>
       </nav>
+      <Toast t={toast}/>
     </div>
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
-</script>
-<script>
-// PWA Service Worker
-if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("/sw.js").catch(()=>{});
-  });
-}
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
 </script>
 </body>
 </html>

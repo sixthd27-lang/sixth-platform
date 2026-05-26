@@ -35,18 +35,18 @@ auth = HTTPBearer(auto_error=False)
 # ══════════════════════════════════════
 app = FastAPI(title="منصة السادس API", docs_url="/docs")
 
-# تحديد المواقع المسموح لها بالاتصال بالسيرفر بشكل آمن
+# تحديد النطاقات المسموح لها بالاتصال بالسيرفر بشكل صريح وأمن
 ALLOWED_ORIGINS = [
-    "https://sixthd27-lang.github.io",  # رابط موقعك الحقيقي على جيتهاب
-    "http://localhost:3000",            # للتطوير المحلي إذا تحتاجه
-    "http://127.0.0.1:5500",            # للـ Live Server في VS Code
+    "https://sixthd27-lang.github.io",  # رابط واجهة موقعك الحالية على جيتهاب
+    "http://localhost:3000",            # للتطوير المحلي إذا احتجته مستقبلاً
+    "http://127.0.0.1:5500"             # لتشغيل Live Server داخل VS Code
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS, 
+    allow_origins=ALLOWED_ORIGINS,
     allow_methods=["*"],
-    allow_headers=["*"], 
+    allow_headers=["*"],
     allow_credentials=True
 )
 

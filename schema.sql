@@ -97,5 +97,5 @@ $$ LANGUAGE plpgsql;
 
 -- ══ Admin account (change password after first login!) ══
 INSERT INTO users(full_name,username,password_hash,role)
-VALUES('المدير','admin','$2b$12$placeholder_change_this',    'admin')
+VALUES('المدير','admin','$2b$12$placeholder_change_this', 'admin')
 ON CONFLICT(username) DO NOTHING;

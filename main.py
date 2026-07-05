@@ -581,6 +581,8 @@ async def handle_document_photo(update: Update, context: ContextTypes.DEFAULT_TY
     )
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await check_subscription(update, context):
+        return
     """معالجة النصوص — اسم الملف أو رسائل أخرى"""
     if context.user_data.get("waiting_rename"):
         name = (update.message.text or "").strip()[:50]

@@ -463,6 +463,8 @@ async def settings_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def clear_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await check_subscription(update, context):
+        return
     session = get_session(context)
     count = len(session["images"])
     if count == 0:

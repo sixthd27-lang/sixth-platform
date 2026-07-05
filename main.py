@@ -478,6 +478,8 @@ async def clear_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def status_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await check_subscription(update, context):
+        return
     session = get_session(context)
     images = session["images"]
     count = len(images)

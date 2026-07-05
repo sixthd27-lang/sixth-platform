@@ -552,6 +552,8 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def handle_document_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await check_subscription(update, context):
+        return
     """معالجة الصور المرسلة كملفات (بدون ضغط)"""
     doc = update.message.document
     if not doc or not doc.mime_type or not doc.mime_type.startswith("image/"):

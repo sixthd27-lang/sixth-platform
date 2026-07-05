@@ -743,7 +743,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # جلسة جديدة
     if data == "new_session":
         session["images"].clear()
-        session["pdf_name"] = "صوري"
+        session["pdf_name"] = "ملف PDF"
+        session["page_size"] = "original"
         await query.edit_message_text(
             "🆕 <b>تم بدء جلسة جديدة!</b>\nأرسل صورك الآن:",
             parse_mode="HTML",

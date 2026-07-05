@@ -191,7 +191,7 @@ def get_session(context: ContextTypes.DEFAULT_TYPE) -> dict:
     if "session" not in context.user_data:
         context.user_data["session"] = {
             "images": [],        # قائمة الصور [(file_id, file_name, size), ...]
-            "page_size": "a4",
+            "page_size": "original",
             "orientation": "portrait",
             "quality": "high",
             "pdf_name": "صوري",

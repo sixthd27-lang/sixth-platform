@@ -45,6 +45,49 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ================================================================================
+# إجباري الاشتراك
+# ================================================================================
+
+REQUIRED_CHANNEL = "@SIXTHCHANNEL27"   # يوزرنيم القناة
+
+async def check_subscription(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    try:
+        member = await context.bot.get_chat_member(REQUIRED_CHANNEL, user_id)
+
+        if member.status in ["member", "administrator", "creator"]:
+            return True
+
+    except Exception:
+        pass
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("📢 اشترك بالقناة", url="https://t.me/SIXTHCHANNEL27")],
+        [InlineKeyboardButton("✅ تحقق من الاشتراك", callback_data="check_join")]
+    ])
+
+    text = (
+        "🚫 <b>لا يمكنك استخدام البوت.</b>\n\n"
+        "يجب الاشتراك أولاً في القناة التالية:\n"
+        "@SIXTHCHANNEL27"
+    )
+
+    if update.callback_query:
+        await update.callback_query.message.reply_text(
+            text,
+            parse_mode="HTML",
+            reply_markup=keyboard
+        )
+    else:
+        await update.message.reply_text(
+            text,
+            parse_mode="HTML",
+            reply_markup=keyboard
+        )
+
+    return False
+# ================================================================================
 # خيارات PDF
 # ================================================================================
 

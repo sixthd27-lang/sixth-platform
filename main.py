@@ -620,6 +620,8 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ================================================================================
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await check_subscription(update, context):
+        return
     query = update.callback_query
     data = query.data
     session = get_session(context)

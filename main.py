@@ -446,6 +446,8 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(HELP_MSG, parse_mode="HTML")
 
 async def settings_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await check_subscription(update, context):
+        return
     session = get_session(context)
     ps = PAGE_SIZES[session["page_size"]][0]
     ori = ORIENTATIONS[session["orientation"]]

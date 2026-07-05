@@ -625,11 +625,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = query.data
     if data == "check_join":
-    if await check_subscription(update, context):
-        await query.message.reply_text(
-            "✅ تم التحقق من الاشتراك، يمكنك استخدام البوت الآن."
-        )
-    return
+        if await check_subscription(update, context):
+            await query.message.reply_text(
+                "✅ تم التحقق من الاشتراك، يمكنك استخدام البوت الآن."
+            )
+        return
     session = get_session(context)
     images = session["images"]
 

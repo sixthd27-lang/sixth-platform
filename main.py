@@ -430,6 +430,10 @@ async def do_convert(update: Update, context: ContextTypes.DEFAULT_TYPE, query=N
 # ================================================================================
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await check_subscription(update, context):
+        return
+
+    
     session = get_session(context)
     count = len(session["images"])
     await update.message.reply_text(

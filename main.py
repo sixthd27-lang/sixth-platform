@@ -502,6 +502,8 @@ async def status_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def rename_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await check_subscription(update, context):
+        return
     context.user_data["waiting_rename"] = True
     await update.message.reply_text(
         "✏️ <b>أرسل الاسم الجديد لملف PDF:</b>\n\n<i>مثال: صور العائلة 2024</i>",
